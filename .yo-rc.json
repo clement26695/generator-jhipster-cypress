@@ -1,0 +1,10 @@
+{
+  "generator-jhipster-module": {
+    "promptValues": {
+      "githubName": "clement26695",
+      "authorName": "Clément Dessoude",
+      "authorEmail": "clement.dessoude.github@gmail.com",
+      "authorUrl": ""
+    }
+  }
+}
