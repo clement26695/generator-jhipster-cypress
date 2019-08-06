@@ -1,0 +1,20 @@
+import 'cypress-file-upload';
+import './authentication';
+import './navbar';
+import './utils';
+<%_ if (authenticationType !== 'oauth2') { _%>
+import './users';
+<%_ } _%>
+// TODO: needle for entity ?
+import './entities';
+<%_ if (authenticationType === 'oauth2') { _%>
+
+Cypress.Cookies.defaults({
+  whitelist: ['JSESSIONID', 'XSRF-TOKEN', 'AUTH_SESSION_ID', 'KEYCLOAK_IDENTITY', 'KEYCLOAK_SESSION']
+})
+<%_ } else if (authenticationType === 'session') { _%>
+
+Cypress.Cookies.defaults({
+  whitelist: ['XSRF-TOKEN']
+});
+<%_ } // TODO: add for uaa _%>

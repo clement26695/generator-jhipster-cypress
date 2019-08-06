@@ -1,0 +1,71 @@
+describe('Administration', () => {
+  const navbarSelector = '[data-e2e-container=navbar]';
+  const userManagementPageHeadingSelector = '[data-e2e-element=user-management-title]';
+  const metricsPageHeadingSelector = '[data-e2e-element=metrics-title]';
+  const healthPageHeadingSelector = '[data-e2e-element=health-title]';
+  const configurationPageHeadingSelector = '[data-e2e-element=configuration-title]';
+  const auditsPageHeadingSelector = '[data-e2e-element=audits-title]';
+  const logsPageHeadingSelector = '[data-e2e-element=logs-title]';
+  const apiPageHeadingSelector = '[data-e2e-element=api]';
+
+  beforeEach(() => {
+    cy.logout();
+    cy.loginWithAdmin();
+    cy.visit('/');
+    cy.wait('@accountRequest');
+  });
+
+  it('should list administration items', () => {
+    cy.get(navbarSelector).find('.dropdown-item');
+  });
+
+<%_ if (authenticationType !== 'oauth2') { _%>
+  it('should load user management', () => {
+    cy.clickOnAdminMenuItem('user-management');
+    cy.get(userManagementPageHeadingSelector).shouldTextBe('Users');
+  });
+<%_ } _%>
+
+<%_ if (applicationType === 'gateway' && serviceDiscoveryType) { _%>
+  it('should load gateway', () => {
+    cy.clickOnAdminMenuItem('gateway');
+    cy.get('#gateway-page-heading')
+      .invoke('text')
+      .should('to.not.have.lengthOf', 0);
+  });
+<%_ } _%>
+
+
+  it('should load metrics', () => {
+    cy.clickOnAdminMenuItem('jhi-metrics');
+    cy.get(metricsPageHeadingSelector).shouldTextBe('Application Metrics');
+  });
+
+  it('should load health', () => {
+    cy.clickOnAdminMenuItem('jhi-health');
+    cy.get(healthPageHeadingSelector).shouldTextBe('Health Checks');
+  });
+
+  it('should load configuration', () => {
+    cy.clickOnAdminMenuItem('jhi-configuration');
+    cy.get(configurationPageHeadingSelector).shouldTextBe('Configuration');
+  });
+
+<%_ if (databaseType !== 'no' && databaseType !== 'cassandra') { _%>
+  it('should load audits', () => {
+    cy.clickOnAdminMenuItem('audits');
+    cy.get(auditsPageHeadingSelector).shouldTextBe('Audits');
+  });
+
+<%_ } _%>
+  it('should load logs', () => {
+    cy.clickOnAdminMenuItem('logs');
+    cy.get(logsPageHeadingSelector).shouldTextBe('Logs');
+  });
+
+// TODO: conditional add this
+  it('should load Swagger API (Docs)', () => {
+    cy.clickOnAdminMenuItem('docs');
+    cy.get(apiPageHeadingSelector);
+  });
+});

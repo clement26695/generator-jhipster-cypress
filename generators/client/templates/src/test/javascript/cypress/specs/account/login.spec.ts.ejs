@@ -1,0 +1,89 @@
+<%_ if (authenticationType !== 'oauth2') { _%>
+import {
+  loginModalSelector,
+  loginTitleSelector,
+  loginUsernameSelector,
+  loginPasswordSelector,
+  loginSubmitSelector,
+  loginAlertSelector
+} from '../../support/page-objects/login-page';
+<%_ } _%>
+
+// TODO: should be in login-page.ts?
+const loginWith = (username: string, password: string) => {
+<%_ if (authenticationType !== 'oauth2') { _%>
+  cy.get(loginModalSelector)
+    .find(loginUsernameSelector)
+    .type(username);
+  cy.get(loginModalSelector)
+    .find(loginPasswordSelector)
+    .type(password);
+  cy.get(loginModalSelector)
+    .find(loginSubmitSelector)
+    .click();
+<%_ } else {_%>
+  cy.get('#username').type(username);
+  cy.get('#password').type(password);
+  cy.get('input[type=submit]').click();
+<%_ } _%>
+};
+
+describe('Log In', () => {
+  const loginPageTitle = 'login-title';
+
+  beforeEach(() => {
+    cy.logout();
+    cy.visit('/');
+    cy.clickOnLoginItem();
+  });
+
+  it('should display login modal', () => {
+    cy.get(loginModalSelector).find(loginTitleSelector);
+    cy.get(loginModalSelector).find(loginUsernameSelector);
+    cy.get(loginModalSelector).find(loginPasswordSelector);
+    cy.get(loginModalSelector).find(loginSubmitSelector);
+
+    // TODO: test checkbox and alert warnings si moins de flemme
+  });
+
+  it('should fail to login with bad password', () => {
+    // WHEN
+    loginWith('admin', 'wrong');
+
+    // THEN
+<%_ if (authenticationType !== 'oauth2') { _%>
+    cy.get(loginModalSelector)
+      .find(loginTitleSelector)
+      .should('exist');
+
+    cy.get(loginModalSelector)
+      .find(loginAlertSelector)
+      .should('have.class', 'alert-danger');
+<%_ } else {_%>
+    cy.get('.alert-error').then($alert => {
+      if ($alert.length) {
+        // Keycloak
+        expect($alert.get(0).innerText).to.equal('Invalid username or password.');
+      } else {
+        // Okta
+        cy.get('.infobox-error').invoke('text').should('equal', 'Sign in failed!');
+      }
+    });
+<%_ } _%>
+  });
+
+  it('should login with admin account', () => {
+    // WHEN
+    loginWith('admin', 'admin');
+
+    // THEN
+<%_ if (authenticationType !== 'oauth2') { _%>
+    cy.get(loginModalSelector)
+      .find(loginTitleSelector)
+      .should('not.exist');
+<%_ } else {_%>
+    cy.get('.alert-success').should('exist');
+<%_ } _%>
+  });
+});
+

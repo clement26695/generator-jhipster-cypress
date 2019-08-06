@@ -1,0 +1,33 @@
+export const <%= entityInstance %>PageSelector = '[data-e2e-container=<%= entityFileName %>-page]';
+export const <%= entityInstance %>TitleSelector = '[data-e2e-element=<%= entityFileName %>-heading]';
+export const <%= entityInstance %>CreateSelector = '[data-e2e-element=create-entity]';
+export const <%= entityInstance %>DeleteButtonSelector = '[data-e2e-element=delete-button]';
+export const <%= entityInstance %>DetailsButtonSelector = '[data-e2e-element=details-button]';
+export const <%= entityInstance %>EditButtonSelector = '[data-e2e-element=edit-button]';
+<%_ if (pagination !== 'no' && pagination !== 'infinite-scroll') { _%>
+export const <%= entityInstance%>SortIdSelector = '[data-e2e-element=sort-id]';
+<%_ } _%>
+
+// Edit
+export const <%= entityInstance %>EditPageSelector = '[data-e2e-container=<%= entityFileName %>-edit-page]';
+export const <%= entityInstance %>EditSaveSelector = '[data-e2e-element=save]';
+export const <%= entityInstance %>EditTitleSelector = '[data-e2e-element=title]';
+
+<%_ for (idx in fields) {
+    const fieldName = fields[idx].fieldName;
+    const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+_%>
+export const <%= entityInstance%>Edit<%= fieldNameCapitalized %>Selector = '[data-e2e-element=<%= entityFileName %>-<%= fieldName %>]';
+<%_ } _%>
+
+
+// Details
+export const <%= entityInstance %>DetailsPageSelector = '[data-e2e-container=<%= entityFileName %>-details-page]';
+export const <%= entityInstance %>DetailsBackSelector = '[data-e2e-element=back]';
+export const <%= entityInstance %>DetailsTitleSelector = '[data-e2e-element=title]';
+export const <%= entityInstance %>DetailsItemSelector = '[data-e2e-element=details-item]';
+
+// Delete
+export const <%= entityInstance %>DeleteModalSelector = '[data-e2e-container=<%= entityFileName %>-delete]';
+export const <%= entityInstance %>DeleteConfirmSelector = '[data-e2e-element=confirm]';
+export const <%= entityInstance %>DeleteBodySelector = '[data-e2e-element=body]';

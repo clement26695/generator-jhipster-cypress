@@ -1,0 +1,405 @@
+<%#
+ Copyright 2013-2019 the original author or authors from the JHipster project.
+
+ This file is part of the JHipster project, see https://www.jhipster.tech/
+ for more information.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-%>
+import {
+  <%= entityInstance%>CreateSelector,
+  <%= entityInstance%>DeleteButtonSelector,
+  <%= entityInstance%>DeleteConfirmSelector,
+  <%= entityInstance%>DeleteModalSelector,
+  <%= entityInstance%>DeleteBodySelector,
+  <%= entityInstance%>DetailsBackSelector,
+  <%= entityInstance%>DetailsButtonSelector,
+  <%= entityInstance%>DetailsItemSelector,
+  <%= entityInstance%>DetailsPageSelector,
+  <%= entityInstance%>DetailsTitleSelector,
+  <%= entityInstance%>EditButtonSelector,
+  <%= entityInstance%>EditPageSelector,
+  <%= entityInstance%>EditSaveSelector,
+  <%= entityInstance%>EditTitleSelector,
+<%_ if (pagination !== 'no' && pagination !== 'infinite-scroll') { _%>
+  <%= entityInstance%>SortIdSelector,
+<%_ } _%>
+<%_ for (idx in fields) {
+  const fieldName = fields[idx].fieldName;
+  const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+_%>
+  <%= entityInstance%>Edit<%= fieldNameCapitalized %>Selector,
+<%_ } _%>
+  <%= entityInstance%>PageSelector,
+  <%= entityInstance%>TitleSelector
+} from '../../support/page-objects/entities/<%= entityFileName%>-pages';
+
+// TODO: conditionnal adding
+import { datetimeToMinutes } from '../../support/utils';
+
+<%_
+const baseApi = (applicationType === 'gateway' && locals.microserviceName) ? microserviceName.toLowerCase() + '/api/' : 'api/';
+_%>
+
+describe('<%= entityClass %> e2e test', () => {
+  let startingEntitiesCount = 0;
+  let entityToDelete: number[] = [];
+
+  beforeEach(function() {
+    cy.logout();
+    cy.loginWithAdmin().then(() => {
+      cy.visit('/entity/<%= entityFileName%>');
+      cy.wait('@accountRequest');
+
+      // TODO: handle OAuth2
+      cy.request({
+        method: 'GET',
+        url: '/<%= baseApi + entityApiUrl %>',
+        auth: {
+          bearer: window.sessionStorage.getItem('jhi-authenticationToken')
+        }
+      })
+        .its('body')
+        .then(entities => {
+          startingEntitiesCount = entities.length;
+        });
+    });
+<%_ if (fieldsContainBlobOrImage) { _%>
+    cy.fixture('integration-test.png').as('imageContent');
+<%_ } _%>
+    cy.fixture('<%= entityFileName%>-body.json').as('defaultEntityBody');
+  });
+
+  it('should load <%= entityClassPlural %>', () => {
+    cy.get(<%= entityInstance%>PageSelector).find(<%= entityInstance%>TitleSelector);
+
+    if (startingEntitiesCount === 0) {
+      // TODO: test if message? stub response?
+      cy.get(<%= entityInstance%>PageSelector)
+        .find(<%= entityInstance%>DeleteButtonSelector)
+        .should('not.exist');
+    } else {
+      // TODO: handle pagination?
+      cy.get(<%= entityInstance%>PageSelector)
+        .find(<%= entityInstance%>DeleteButtonSelector)
+        .should('have.lengthOf', startingEntitiesCount);
+    }
+  });
+
+  it('should load create <%= entityClass %> page', function() {
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>CreateSelector)
+      .click();
+
+    cy.get(<%= entityInstance%>EditPageSelector)
+      .find(<%= entityInstance%>EditSaveSelector)
+      .should('exist');
+
+    cy.get(<%= entityInstance%>EditPageSelector)
+      .find(<%= entityInstance%>EditTitleSelector)
+<%_ if (enableTranslation) { _%>
+      // TODO: to remove ?
+      .invoke('attr', 'id')
+      .should('match', /<%= i18nKeyPrefix %>.home.createOrEditLabel/);
+<%_ } else { _%>
+      .contains('Create or edit a <%= entityAngularName %>');
+<%_ } _%>
+  });
+
+   it('should create and save <%= entityClassPlural %>', function() {
+    cy.server();
+    cy.route('POST', '/<%= baseApi + entityApiUrl %>').as('saveEntityRequest');
+
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>CreateSelector)
+      .click();
+
+    <%_ fields.forEach((field) => {
+      const fieldName = field.fieldName;
+      const fieldNameCapitalized = field.fieldNameCapitalized;
+      const fieldType = field.fieldType;
+      const fieldTypeBlobContent = field.fieldTypeBlobContent;
+      const fieldIsEnum = field.fieldIsEnum;
+    _%>
+    cy.get(<%= entityInstance%>EditPageSelector)
+      .find(<%= entityInstance%>Edit<%= fieldNameCapitalized %>Selector)
+    <%_ if (['Integer', 'Long', 'Float', 'Double', 'BigDecimal'].includes(fieldType)) { _%>
+      .type('5')
+      .should('have.value', '5');
+
+    <%_ } else if (fieldType === 'LocalDate') { _%>
+      .type('2001-01-01')
+      .should('have.value', '2001-01-01');
+
+    <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
+      .clear()
+      .then($input => {
+        const htmlElementInput = $input.get(0);
+        const currentDateInMinutes = htmlElementInput.value === '' ? 0 : datetimeToMinutes(htmlElementInput.value);
+        htmlElementInput.stepUp(datetimeToMinutes('2001-01-01T02:30') - currentDateInMinutes);
+      })
+      .trigger('change', {force: true})
+      .should('have.value', '2001-01-01T02:30');
+
+    <%_ } else if (fieldType === 'Duration') { _%>
+      .type('PT12S')
+      .should('have.value', '12');
+
+    <%_ } else if (fieldType === 'Boolean') { _%>
+      .should('not.be.checked')
+      .click()
+      .should('be.checked');
+
+    <%_ } else if (['byte[]', 'ByteBuffer'].includes(fieldType) && fieldTypeBlobContent !== 'text') { _%>
+      .eq(0).upload(
+        { fileContent: this.imageContent, fileName: 'integration-test.png', mimeType: 'image/png' },
+        { subjectType: 'input' },
+      );
+
+    <%_ } else if (fieldIsEnum) { _%>
+      .find('option').last()
+      .then($els => $els.get(0).setAttribute('selected', 'selected'))
+      .parent()
+      .trigger('change')
+
+    <%_ } else if (fieldType === 'UUID'){ _%>
+      .type('64c99148-3908-465d-8c4a-e510e3ade974')
+      .invoke('val')
+      .should('match', /64c99148-3908-465d-8c4a-e510e3ade974/);
+
+    <%_ } else { _%>
+      .type('<%= fieldName %>')
+      .invoke('val').should('match', /<%= fieldName %>/);
+
+    <%_ } _%>
+    <%_ }); _%>
+    <%_ relationships.forEach((relationship) => {
+      const relationshipType = relationship.relationshipType;
+      const ownerSide = relationship.ownerSide;
+      const relationshipName = relationship.relationshipName; _%>
+    <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+    // <%= entityClass %>UpdatePage.<%=relationshipName %>SelectLastOption();
+    <%_ } else if ((relationshipType === 'many-to-many' && ownerSide === true)) { _%>
+    // <%= entityClass %>UpdatePage.<%=relationshipName %>SelectLastOption();
+    <%_ } _%>
+    <%_ }); _%>
+
+     cy.get(<%= entityInstance%>EditPageSelector)
+      .find(<%= entityInstance%>EditSaveSelector)
+      .click();
+
+    cy.wait('@saveEntityRequest')
+      .its('responseBody')
+      .then(entity => {
+        // @ts-ignore
+        entityToDelete.push(entity.id);
+      });
+
+    cy.get(<%= entityInstance%>EditPageSelector).should('not.exist');
+
+    // Success toast should appear
+    cy.getSuccessToast().should('exist');
+
+    cy.request({
+      method: 'GET',
+      url: '/<%= baseApi + entityApiUrl %>',
+      auth: {
+        bearer: window.sessionStorage.getItem('jhi-authenticationToken')
+      }
+    })
+      .its('body')
+      .then(entities => {
+        expect(entities.length).to.equal(startingEntitiesCount + 1);
+      });
+  });
+
+  it('should load details <%= entityClass %> page and fetch data', function() {
+    // TODO: fix request body
+    cy.createEntity('<%= entityApiUrl %>', this.defaultEntityBody).then(response => {
+      entityToDelete.push(response.body.id);
+    });
+    cy.reload();
+
+    <%_ if (pagination !== 'no' && pagination !== 'infinite-scroll') { _%>
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>SortIdSelector)
+      .click();
+    <%_ } _%>
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>DetailsButtonSelector)
+      .last()
+      .click();
+
+    cy.get(<%= entityInstance%>DetailsPageSelector)
+      .find(<%= entityInstance%>DetailsTitleSelector)
+      .invoke('text')
+      .should('not.have.lengthOf', 0);
+
+    cy.get(<%= entityInstance%>DetailsPageSelector)
+      .find(<%= entityInstance%>DetailsItemSelector)
+      .first()
+      .invoke('text')
+      .should('not.have.lengthOf', 0);
+
+    cy.get(<%= entityInstance%>DetailsPageSelector)
+      .find(<%= entityInstance%>DetailsBackSelector)
+      .click();
+
+    cy.request({
+      method: 'GET',
+      url: '/<%= baseApi + entityApiUrl %>',
+      auth: {
+        bearer: window.sessionStorage.getItem('jhi-authenticationToken')
+      }
+    })
+      .its('body')
+      .then(entities => {
+        expect(entities.length).to.equal(startingEntitiesCount + 1);
+      });
+  });
+
+  it('should load edit <%= entityClass %> page and fetch data', function() {
+    cy.createEntity('<%= entityApiUrl %>', this.defaultEntityBody).then(response => {
+      entityToDelete.push(response.body.id);
+    });
+    cy.reload();
+
+    <%_ if (pagination !== 'no' && pagination !== 'infinite-scroll') { _%>
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>SortIdSelector)
+      .click();
+    <%_ } _%>
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>EditButtonSelector)
+      .last()
+      .click();
+
+    cy.get(<%= entityInstance%>EditPageSelector)
+      .find(<%= entityInstance%>EditTitleSelector)
+      .invoke('text')
+      .should('not.have.lengthOf', 0);
+
+    <%_ fields.forEach((field) => {
+      const fieldNameCapitalized = field.fieldNameCapitalized;
+      const fieldType = field.fieldType;
+      const fieldTypeBlobContent = field.fieldTypeBlobContent;
+      const fieldIsEnum = field.fieldIsEnum;
+    _%>
+    cy.get(<%= entityInstance%>EditPageSelector)
+      .find(<%= entityInstance%>Edit<%= fieldNameCapitalized %>Selector)
+    <%_ if (['Integer', 'Long', 'Float', 'Double', 'BigDecimal'].includes(fieldType)) { _%>
+      .clear()
+      .type('6')
+      .should('have.value', '6');
+
+    <%_ } else if (fieldType === 'LocalDate') { _%>
+      .clear()
+      .type('2019-01-01')
+      .should('have.value', '2019-01-01');
+
+    <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
+      .clear()
+      .then($input => {
+        const htmlElementInput = $input.get(0);
+        const currentDateInMinutes = htmlElementInput.value === '' ? 0 : datetimeToMinutes(htmlElementInput.value);
+        htmlElementInput.stepUp(datetimeToMinutes('2019-01-01T02:30') - currentDateInMinutes);
+      })
+      .trigger('change', {force: true})
+      .should('have.value', '2019-01-01T02:30');
+
+    <%_ } else if (fieldType === 'Duration') { _%>
+      .clear()
+      .type('PT14S')
+      .should('have.value', '14');
+
+    <%_ } else if (fieldType === 'Boolean') { _%>
+      .should('be.checked')
+      .click()
+      .should('not.be.checked');
+
+    <%_ } else if (fieldType === 'UUID'){ _%>
+      .clear()
+      .type('64c99148-3908-465d-8c4a-e510e3ade978')
+      .invoke('val')
+      .should('match', /64c99148-3908-465d-8c4a-e510e3ade978/);
+
+    <%_ } else if (!fieldIsEnum && !(['byte[]', 'ByteBuffer'].includes(fieldType) && fieldTypeBlobContent !== 'text')) { _%>
+      .clear()
+      .type('modified')
+      .invoke('val')
+      .should('match', /modified/);
+
+    <%_ } _%>
+    <%_ }); _%>
+
+    cy.get(<%= entityInstance%>EditPageSelector)
+      .find(<%= entityInstance%>EditSaveSelector)
+      .click();
+
+    cy.get(<%= entityInstance%>EditPageSelector).should('not.exist');
+
+    // Info toast should appear
+    cy.getInfoToast().should('exist');
+  });
+
+  it('should delete last <%= entityClass %>', function() {
+    cy.createEntity('<%= entityApiUrl %>', this.defaultEntityBody).then(response => {
+      entityToDelete.push(response.body.id);
+    });
+    cy.reload();
+
+    <%_ if (pagination !== 'no' && pagination !== 'infinite-scroll') { _%>
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>SortIdSelector)
+      .click();
+    <%_ } _%>
+    cy.get(<%= entityInstance%>PageSelector)
+      .find(<%= entityInstance%>DeleteButtonSelector)
+      .last()
+      .click();
+
+     cy.get(<%= entityInstance%>DeleteModalSelector)
+      .find(<%= entityInstance%>DeleteBodySelector)
+      .should('be.visible')
+
+    cy.get(<%= entityInstance%>DeleteModalSelector)
+      .find(<%= entityInstance%>DeleteConfirmSelector)
+      .click();
+
+    // Delete modal should disappear
+    cy.get(<%= entityInstance%>DeleteModalSelector)
+      .find(<%= entityInstance%>DeleteBodySelector)
+      .should('not.be.visible');
+
+    cy.request({
+      method: 'GET',
+      url: '/<%= baseApi + entityApiUrl %>',
+      auth: {
+        bearer: window.sessionStorage.getItem('jhi-authenticationToken')
+      }
+    })
+      .its('body')
+      .then(entities => {
+        expect(entities.length).to.equal(startingEntitiesCount);
+        entityToDelete = [];
+      });
+
+    // Danger toast should appear
+    cy.getDangerToast().should('exist');
+  });
+
+  afterEach(() => {
+    cy.cleanEntity('<%= entityApiUrl %>', entityToDelete);
+    entityToDelete = [];
+  });
+});

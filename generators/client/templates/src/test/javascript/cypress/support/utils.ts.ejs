@@ -1,0 +1,52 @@
+<%#
+Copyright 2013-2019 the original author or authors from the JHipster project.
+
+This file is part of the JHipster project, see https://www.jhipster.tech/
+for more information.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-%>
+// Maybe add chai assertion instead
+Cypress.Commands.add(
+  'shouldTextBe',
+  {
+    prevSubject: true
+  },
+  (subject: any, text: string) => {
+    return cy
+      .wrap(subject)
+      .invoke('text')
+      .should('eq', text);
+  }
+);
+
+Cypress.Commands.add('getSuccessToast', () => cy.get('div[role=alert].alert.alert-success'));
+Cypress.Commands.add('getInfoToast', () => cy.get('div[role=alert].alert.alert-info'));
+Cypress.Commands.add('getDangerToast', () => cy.get('div[role=alert].alert.alert-danger'));
+
+// Fix timezone
+export const datetimeToMinutes = (datetime: string) => new Date(datetime).valueOf() / 60000;
+
+declare global {
+  namespace Cypress {
+    interface Chainable<Subject> {
+      shouldTextBe(text: string): Cypress.Chainable;
+      getSuccessToast(): Cypress.Chainable;
+      getInfoToast(): Cypress.Chainable;
+      getDangerToast(): Cypress.Chainable;
+    }
+  }
+}
+
+// Convert this to a module instead of script (allows import/export)
+export {};

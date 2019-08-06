@@ -1,0 +1,60 @@
+<%#
+Copyright 2013-2019 the original author or authors from the JHipster project.
+
+This file is part of the JHipster project, see https://www.jhipster.tech/
+for more information.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-%>
+// Main page
+export const usersTableBody = '[data-e2e-container=users-table-body]';
+export const userDeleteModalPageSelector = '[data-e2e-container=user-delete-modal]';
+
+export const getUserDeactivatedButtonByLogin = (login: string) =>
+  cy
+    .get(usersTableBody)
+    .find('#' + login)
+    .find('.btn-danger.deactivated');
+
+export const getUserDeleteButtonByLogin = (login: string) =>
+  cy
+    .get(usersTableBody)
+    .find('#' + login)
+    .find('.btn-danger.delete');
+
+export const getUserDetailsButtonByLogin = (login: string) =>
+  cy
+    .get(usersTableBody)
+    .find('#' + login)
+    .find('.btn-info.details');
+
+export const getUserEditButtonByLogin = (login: string) =>
+  cy
+    .get(usersTableBody)
+    .find('#' + login)
+    .find('.btn-primary.edit');
+
+export const getUserEmailByLogin = (login: string) =>
+  cy
+    .get(usersTableBody)
+    .find('#' + login)
+    .find('.jhi-user-email');
+
+// User edit page
+export const userEditPageSelector = '[data-e2e-container=user-edit-page]';
+export const userEditEmailSelector = '[data-e2e-element=email]';
+export const userEditSaveSelector = '[data-e2e-element=save]';
+
+// User details page
+export const userDetailsPageSelector = '[data-e2e-container=user-details-page]';
+export const userDetailsLoginSelector = '[data-e2e-element=user-login]';

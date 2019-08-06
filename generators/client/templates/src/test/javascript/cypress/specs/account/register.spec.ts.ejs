@@ -1,0 +1,82 @@
+<%#
+Copyright 2013-2019 the original author or authors from the JHipster project.
+
+This file is part of the JHipster project, see https://www.jhipster.tech/
+for more information.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-%>
+import {
+  autoSignUpUsing,
+  registerConfirmationPasswordSelector,
+  registerEmailSelector,
+  registerPageSelector,
+  registerPasswordSelector,
+  registerSubmitSelector,
+  registerTitleSelector,
+  registerUsernameSelector
+} from '../../support/page-objects/register-page';
+
+describe('Register', () => {
+  beforeEach(() => {
+    cy.cleanUsers();
+    // TODO: Move logout to support ? It would run before each test
+    cy.logout();
+    <%_ if (authenticationType !== 'session') { _%>
+    cy.visit('/register');
+    <%_ } else { _%>
+    cy.visit('/');
+    cy.clickOnRegisterItem();
+    <%_ } _%>
+  });
+
+  it('should display register page', () => {
+    cy.get(registerPageSelector).find(registerTitleSelector);
+    cy.get(registerPageSelector).find(registerUsernameSelector);
+    cy.get(registerPageSelector).find(registerEmailSelector);
+    cy.get(registerPageSelector).find(registerPasswordSelector);
+    cy.get(registerPageSelector).find(registerConfirmationPasswordSelector);
+    cy.get(registerPageSelector).find(registerSubmitSelector);
+  });
+
+  it('should be able to sign up', () => {
+    // WHEN
+    autoSignUpUsing('user_test', 'admin@localhost.jh', 'user_test');
+
+    // THEN
+    cy.getSuccessToast().should('exist');
+  });
+
+  // TODO: test input required + password match
+
+  it('should not be able to sign up if login already taken', () => {
+    // GIVEN
+    cy.createAndActivateUserUsing('user-login-taken', 'user-login-taken@localhost.jh', 'user-login-taken');
+
+    autoSignUpUsing('user-login-taken', 'user-login-taken@localhost.jh', 'user-login-taken');
+
+    // THEN
+    cy.getDangerToast().should('exist');
+  });
+
+  it('should not be able to sign up if email already taken', () => {
+    // GIVEN
+    cy.createAndActivateUserUsing('user-email-taken', 'user-email-taken@localhost.jh', 'user-email-taken');
+
+    // WHEN
+    autoSignUpUsing('user-email-taken', 'user-email-taken@localhost.jh', 'user-email-taken');
+
+    // THEN
+    cy.getDangerToast().should('exist');
+  });
+});

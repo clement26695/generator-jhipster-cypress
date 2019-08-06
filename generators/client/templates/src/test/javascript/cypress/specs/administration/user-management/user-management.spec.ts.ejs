@@ -1,0 +1,63 @@
+<%#
+Copyright 2013-2019 the original author or authors from the JHipster project.
+
+This file is part of the JHipster project, see https://www.jhipster.tech/
+for more information.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-%>
+import {
+  getUserDeactivatedButtonByLogin,
+  getUserDeleteButtonByLogin,
+  userDeleteModalPageSelector
+} from '../../../support/page-objects/user-management-pages';
+
+describe('User Management', () => {
+  beforeEach(() => {
+    cy.cleanUsers();
+    // TODO: Move logout to support ? It would run before each test
+    cy.logout();
+    cy.loginWithAdmin();
+    cy.visit('/admin/user-management');
+    cy.wait('@accountRequest');
+  });
+
+  it('should be able to activate deactivated user', () => {
+    // GIVEN
+    cy.registerUserUsing('user-deactivated', 'user-deactivated@localhost.jh', 'user-deactivated');
+    cy.reload();
+
+    // WHEN
+    getUserDeactivatedButtonByLogin('user-deactivated').click();
+
+    // THEN
+    getUserDeactivatedButtonByLogin('user-deactivated').should('not.exist');
+  });
+
+  it('should be able to delete existing user', () => {
+    // GIVEN
+    cy.registerUserUsing('user-to-delete', 'user-to-delete@localhost.jh', 'user-to-delete');
+    cy.reload();
+
+    // WHEN
+    getUserDeleteButtonByLogin('user-to-delete').click();
+    cy.get(userDeleteModalPageSelector)
+      .find('button')
+      .contains('OK')
+      .click();
+
+    // THEN
+    cy.get(userDeleteModalPageSelector).should('not.be.visible');
+    cy.getDangerToast().should('exist');
+  });
+});

@@ -1,0 +1,150 @@
+<%#
+Copyright 2013-2019 the original author or authors from the JHipster project.
+
+This file is part of the JHipster project, see https://www.jhipster.tech/
+for more information.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-%>
+<%_
+const baseApi = (applicationType === 'gateway' && locals.microserviceName) ? microserviceName.toLowerCase() + '/api/' : 'api/';
+_%>
+Cypress.Commands.add('registerUserUsing', (login: string, email: string, password: string) => {
+  return <% if (authenticationType === 'session') { %> cy.getXsrfToken().then((cookie: any) => { <%_ } _%> cy.request({
+    method: 'POST',
+    url: '/<%= baseApi %>register',
+    body: {
+      login,
+      email,
+      password
+    }<%_ if (authenticationType === 'session') { _%>,
+    headers: {
+      'X-XSRF-TOKEN': cookie.value
+    }
+  });
+    <%_ } _%>
+  });
+});
+
+
+
+Cypress.Commands.add(
+  'createAndActivateUserUsing',
+  (login: string, email: string, password: string, firstName?: string, lastName?: string) => {
+    cy.registerUserUsing(login, email, password).then(() => {
+      cy.loginWithAdmin().then(result => {
+      <%_ if (authenticationType === 'jwt') { _%>
+      const auth = window.sessionStorage.getItem('jhi-authenticationToken');
+      <%_ } else if (authenticationType === 'session') { _%>
+      cy.getXsrfToken().then((cookie: any) => {
+      <%_ } _%>
+        cy.request({
+          method: 'GET',
+          url: '/<%= baseApi %>users',
+        <%_ if (authenticationType === 'jwt') { _%>
+          auth: {
+            bearer: auth
+          }
+        <%_ } else if (authenticationType === 'session') { _%>
+          headers: {
+            'X-XSRF-TOKEN': cookie.value
+          }
+        <%_ } _%>
+        }).then(response => {
+          // TODO: replace any by correct type
+          response.body.forEach((user: any) => {
+            if (user.login === login) {
+              cy.request({
+                method: 'PUT',
+                url: '/<%= baseApi %>users',
+                body: {
+                  ...user,
+                  firstName,
+                  lastName,
+                  activated: true
+                },
+              <%_ if (authenticationType === 'jwt') { _%>
+                auth: {
+                  bearer: auth
+                }
+              <%_ } else if (authenticationType === 'session') { _%>
+                headers: {
+                  'X-XSRF-TOKEN': cookie.value
+                }
+              <%_ } _%>
+              });
+            }
+          <%_ if (authenticationType === 'session') { _%> }); <%_ } _%>
+          });
+        });
+      });
+      cy.logout();
+    });
+  }
+);
+
+Cypress.Commands.add('cleanUsers', () => {
+  cy.loginWithAdmin().then(() => {
+    <%_ if (authenticationType === 'jwt') { _%>
+    const auth = window.sessionStorage.getItem('jhi-authenticationToken');
+    <%_ } else if (authenticationType === 'session') { _%>
+    cy.getXsrfToken().then((cookie: any) => {
+    <%_ } _%>
+    cy.request({
+      method: 'GET',
+      url: `/<%= baseApi %>users`,
+    <%_ if (authenticationType === 'jwt') { _%>
+      auth: {
+        bearer: auth
+      }
+    <%_ } else if (authenticationType === 'session') { _%>
+      headers: {
+        'X-XSRF-TOKEN': cookie.value
+      }
+    <%_ } _%>
+    }).then(response => {
+        // TODO: replace any by correct type
+        response.body.forEach((user: any) => {
+        if (!['user', 'admin', 'system'].includes(user.login)) {
+          cy.request({
+            method: 'DELETE',
+            url: `/<%= baseApi %>users/${user.login}`,
+          <%_ if (authenticationType === 'jwt') { _%>
+            auth: {
+              bearer: auth
+            }
+          <%_ } else if (authenticationType === 'session') { _%>
+            headers: {
+              'X-XSRF-TOKEN': cookie.value
+            }
+          <%_ } _%>
+          });
+        }
+      });<%_ if (authenticationType === 'session') { _%> }); <%_ } _%>
+    });
+  });
+  cy.logout();
+});
+
+declare global {
+  namespace Cypress {
+    interface Chainable<Subject> {
+      registerUserUsing(login: string, email: string, password: string): Cypress.Chainable;
+      createAndActivateUserUsing(login: string, email: string, password: string, firstName?: string, lastName?: string): Cypress.Chainable;
+      cleanUsers(): void;
+    }
+  }
+}
+
+// Convert this to a module instead of script (allows import/export)
+export {};
