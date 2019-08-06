@@ -1,10 +1,11 @@
-# generator-jhipster-cypress
-[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> JHipster module, 
+> ## 🛠 In active development
+>
+
+# JHipster Cypress
 
 # Introduction
 
-This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application.
+This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. It's goal is to provide End-to-End testing with [Cypress.io](https://www.cypress.io/).
 
 # Prerequisites
 
@@ -12,37 +13,24 @@ As this is a [JHipster](https://www.jhipster.tech/) module, we expect you have J
 
 - [Installing JHipster](https://www.jhipster.tech/installation/)
 
-# Installation
+## 🚀 How to get started
 
-## With NPM
+The package is not published yet. So, to use it, you'll need: 
+1. Make sure you have `yo` installed with `npm install -g yo`
+2. Clone the package with `git clone https://github.com/clement26695/generator-jhipster-cypress.git`
+3. Link the package with `cd generator-jhipster-cypress && npm link`
 
-To install this module:
+You can then use it in your JHipster application by:
+1. Init the use of the module by running `yo jhipster-cypress`
+2. Generate common E2E tests by running `yo jhipster-cypress:client`
+3. Generate entity E2E tests by running `yo jhipster-cypress:entity-client`
 
-```bash
-npm install -g generator-jhipster-cypress
-```
+In the future, cypress tests will be automatically generated when creating a new entity.
 
-To update this module:
+## 🚦 What we have now
 
-```bash
-npm update -g generator-jhipster-cypress
-```
-
-## With Yarn
-
-To install this module:
-
-```bash
-yarn global add generator-jhipster-cypress
-```
-
-To update this module:
-
-```bash
-yarn global upgrade generator-jhipster-cypress
-```
-
-# Usage
+⚠️ This module is in development and does not work out of the box yet. We will have to introduce special selectors in the JHipster templates to use this module out of the box.
+ 
 
 # License
 
