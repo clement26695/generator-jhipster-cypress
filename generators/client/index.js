@@ -17,6 +17,7 @@ module.exports = class extends BaseGenerator {
                 }
                 this.authenticationType = configuration.get('authenticationType') || this.configOptions.authenticationType;
                 this.databaseType = configuration.get('databaseType') || this.configOptions.databaseType;
+                this.clientFramework = configuration.get('clientFramework') || this.configOptions.clientFramework;
 
                 const baseName = configuration.get('baseName');
                 if (baseName) {

@@ -54,7 +54,7 @@ describe('User Management', () => {
     getUserDeleteButtonByLogin('user-to-delete').click();
     cy.get(userDeleteModalPageSelector)
       .find('button')
-      .contains('OK')
+      .contains(<%_ if (clientFramework === 'vue') { _%>'OK'<%_ } else { _%>'Delete'<%_ } _%>)
       .click();
 
     // THEN
