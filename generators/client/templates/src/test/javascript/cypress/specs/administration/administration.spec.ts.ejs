@@ -37,17 +37,17 @@ describe('Administration', () => {
 
 
   it('should load metrics', () => {
-    cy.clickOnAdminMenuItem('jhi-metrics');
+    cy.clickOnAdminMenuItem('metrics');
     cy.get(metricsPageHeadingSelector).shouldTextBe('Application Metrics');
   });
 
   it('should load health', () => {
-    cy.clickOnAdminMenuItem('jhi-health');
+    cy.clickOnAdminMenuItem('health');
     cy.get(healthPageHeadingSelector).shouldTextBe('Health Checks');
   });
 
   it('should load configuration', () => {
-    cy.clickOnAdminMenuItem('jhi-configuration');
+    cy.clickOnAdminMenuItem('configuration');
     cy.get(configurationPageHeadingSelector).shouldTextBe('Configuration');
   });
 
@@ -63,7 +63,7 @@ describe('Administration', () => {
     cy.get(logsPageHeadingSelector).shouldTextBe('Logs');
   });
 
-// TODO: conditional add this
+  // TODO: conditional add this
   it('should load Swagger API (Docs)', () => {
     cy.clickOnAdminMenuItem('docs');
     cy.get(apiPageHeadingSelector);
