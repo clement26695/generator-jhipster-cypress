@@ -17,9 +17,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -%>
 import {
-  getUserDeactivatedButtonByLogin,
+  getUserDeactivateButtonByLogin,
   getUserDeleteButtonByLogin,
-  userDeleteModalPageSelector
+  userDeleteModalPageSelector,
+  getUserActivateButtonByLogin
 } from '../../../support/page-objects/user-management-pages';
 
 describe('User Management', () => {
@@ -38,10 +39,10 @@ describe('User Management', () => {
     cy.reload();
 
     // WHEN
-    getUserDeactivatedButtonByLogin('user-deactivated').click();
+    getUserActivateButtonByLogin('user-deactivated').click();
 
     // THEN
-    getUserDeactivatedButtonByLogin('user-deactivated').should('not.exist');
+    getUserDeactivateButtonByLogin('user-deactivated').should('not.exist');
   });
 
   it('should be able to delete existing user', () => {

@@ -19,36 +19,48 @@ limitations under the License.
 // Main page
 export const usersTableBody = '[data-e2e-container=users-table-body]';
 export const userDeleteModalPageSelector = '[data-e2e-container=user-delete-modal]';
+export const userActivateButtonSelector = '[data-e2e-element=activate-button]';
+export const userDeactivateButtonSelector = '[data-e2e-element=deactivate-button]';
+export const userDeleteButtonSelector = '[data-e2e-element=delete-button]';
+export const userDetailButtonSelector = '[data-e2e-element=detail-button]';
+export const userEditButtonSelector = '[data-e2e-element=edit-button]';
+export const userEmailSelector = '[data-e2e-element=email]';
 
-export const getUserDeactivatedButtonByLogin = (login: string) =>
+export const getUserDeactivateButtonByLogin = (login: string) =>
   cy
     .get(usersTableBody)
     .find('#' + login)
-    .find('.btn-danger.deactivated');
+    .find(userDeactivateButtonSelector);
+
+export const getUserActivateButtonByLogin = (login: string) =>
+  cy
+    .get(usersTableBody)
+    .find('#' + login)
+    .find(userActivateButtonSelector);
 
 export const getUserDeleteButtonByLogin = (login: string) =>
   cy
     .get(usersTableBody)
     .find('#' + login)
-    .find('.btn-danger.delete');
+    .find(userDeleteButtonSelector);
 
 export const getUserDetailsButtonByLogin = (login: string) =>
   cy
     .get(usersTableBody)
     .find('#' + login)
-    .find('.btn-info.details');
+    .find(userDetailButtonSelector);
 
 export const getUserEditButtonByLogin = (login: string) =>
   cy
     .get(usersTableBody)
     .find('#' + login)
-    .find('.btn-primary.edit');
+    .find(userEditButtonSelector);
 
 export const getUserEmailByLogin = (login: string) =>
   cy
     .get(usersTableBody)
     .find('#' + login)
-    .find('.jhi-user-email');
+    .find(userEmailSelector);
 
 // User edit page
 export const userEditPageSelector = '[data-e2e-container=user-edit-page]';
