@@ -22,11 +22,11 @@ Cypress.Commands.add(
   {
     prevSubject: true
   },
-  (subject: any, text: string) => {
-    return cy
+  (subject: any, text: string) =>
+    cy
       .wrap(subject)
       .invoke('text')
-      .should('eq', text);
+      .should('eq', text)
   }
 );
 

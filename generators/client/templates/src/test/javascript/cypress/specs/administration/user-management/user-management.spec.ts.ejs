@@ -42,7 +42,7 @@ describe('User Management', () => {
     getUserActivateButtonByLogin('user-deactivated').click();
 
     // THEN
-    getUserDeactivateButtonByLogin('user-deactivated').should('not.exist');
+    getUserDeactivateButtonByLogin('user-deactivated').should('exist');
   });
 
   it('should be able to delete existing user', () => {
