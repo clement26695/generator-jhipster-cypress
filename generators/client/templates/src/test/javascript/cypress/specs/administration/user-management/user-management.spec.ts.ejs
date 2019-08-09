@@ -59,6 +59,10 @@ describe('User Management', () => {
 
     // THEN
     cy.get(userDeleteModalPageSelector).should('not.be.visible');
+<%_ if (clientFramework === 'vue') { _%>
     cy.getDangerToast().should('exist');
+<%_ } else { _%>
+    cy.getSuccessToast().should('exist');
+<%_ } _%>
   });
 });

@@ -50,7 +50,11 @@ describe('User Edit', () => {
       .click();
 
     // THEN
+<%_ if (clientFramework === 'vue') { _%>
     cy.getInfoToast().should('exist');
+<%_ } else { _%>
+    cy.getSuccessToast().should('exist');
+<%_ } _%>
     getUserEmailByLogin('user-edit-details').shouldTextBe('user-edit-details@localhost.jhipster');
   });
 });

@@ -27,12 +27,17 @@ Cypress.Commands.add(
       .wrap(subject)
       .invoke('text')
       .should('eq', text)
-  }
 );
 
-Cypress.Commands.add('getSuccessToast', () => cy.get('div[role=alert].alert.alert-success'));
-Cypress.Commands.add('getInfoToast', () => cy.get('div[role=alert].alert.alert-info'));
-Cypress.Commands.add('getDangerToast', () => cy.get('div[role=alert].alert.alert-danger'));
+<%_ if (clientFramework === 'react') { _%>
+Cypress.Commands.add('getSuccessToast', () => cy.get('.Toastify__toast--success'));
+Cypress.Commands.add('getInfoToast', () => cy.get('.Toastify__toast--info'));
+Cypress.Commands.add('getDangerToast', () => cy.get('.Toastify__toast--error'));
+<%_ } else { _%>
+Cypress.Commands.add('getSuccessToast', () => cy.get('[role=alert].alert.alert-success'));
+Cypress.Commands.add('getInfoToast', () => cy.get('[role=alert].alert.alert-info'));
+Cypress.Commands.add('getDangerToast', () => cy.get('[role=alert].alert.alert-danger'));
+<%_ } _%>
 
 // Fix timezone
 export const datetimeToMinutes = (datetime: string) => new Date(datetime).valueOf() / 60000;
