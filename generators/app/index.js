@@ -98,6 +98,22 @@ module.exports = class extends BaseGenerator {
         }
     }
 
+    get configuring() {
+        return {
+            composeClient() {
+                if (this.skipClient) return;
+                const options = this.options;
+                const configOptions = this.configOptions;
+
+                this.composeWith(require.resolve('../client'), {
+                    ...options,
+                    configOptions,
+                    debug: this.isDebugEnabled
+                });
+            },
+        };
+    }
+
     end() {
         this.log('End of cypress generator');
     }
