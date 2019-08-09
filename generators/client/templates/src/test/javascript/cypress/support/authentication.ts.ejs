@@ -37,7 +37,11 @@ Cypress.Commands.add('loginUsing', (username: string, password: string) => {
     .then((result: any) => {
       const bearerToken = result.headers.authorization;
       if (bearerToken && bearerToken.slice(0, 7) === 'Bearer ') {
+<%_ if (clientFramework === 'angularX') { _%>
+        window.sessionStorage.setItem('jhi-authenticationtoken', `"${bearerToken.slice(7, bearerToken.length)}"`);
+<%_ } else { _%>
         window.sessionStorage.setItem('jhi-authenticationToken', bearerToken.slice(7, bearerToken.length));
+<%_ } _%>
       }
     });
 });
@@ -76,8 +80,13 @@ Cypress.Commands.add('loginWithAdmin', () => {
 
 <%_ if (authenticationType === 'jwt') { _%>
 Cypress.Commands.add('logout', () => {
+  <%_ if (clientFramework === 'angularX') { _%>
+  window.sessionStorage.removeItem('jhi-authenticationtoken');
+  window.localStorage.removeItem('jhi-authenticationtoken');
+  <%_ } else { _%>
   window.sessionStorage.removeItem('jhi-authenticationToken');
   window.localStorage.removeItem('jhi-authenticationToken');
+  <%_ } _%>
 });
 <%_ } else if (authenticationType === 'session') { _%>
 Cypress.Commands.add('logout', () => {

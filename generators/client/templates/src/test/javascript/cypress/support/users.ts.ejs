@@ -32,11 +32,9 @@ Cypress.Commands.add('registerUserUsing', (login: string, email: string, passwor
       'X-XSRF-TOKEN': cookie.value
     }
   });
-    <%_ } _%>
+    <% } %>
   });
 });
-
-
 
 Cypress.Commands.add(
   'createAndActivateUserUsing',
@@ -44,7 +42,12 @@ Cypress.Commands.add(
     cy.registerUserUsing(login, email, password).then(() => {
       cy.loginWithAdmin().then(result => {
       <%_ if (authenticationType === 'jwt') { _%>
-      const auth = window.sessionStorage.getItem('jhi-authenticationToken');
+        <%_ if (clientFramework === 'angularX') { _%>
+        let auth = window.sessionStorage.getItem('jhi-authenticationtoken');
+        auth = auth !== null ? auth.replace('"', '') : null;
+        <%_ } else { _%>
+        const auth = window.sessionStorage.getItem('jhi-authenticationToken');
+        <%_ } _%>
       <%_ } else if (authenticationType === 'session') { _%>
       cy.getXsrfToken().then((cookie: any) => {
       <%_ } _%>
@@ -96,7 +99,12 @@ Cypress.Commands.add(
 Cypress.Commands.add('cleanUsers', () => {
   cy.loginWithAdmin().then(() => {
     <%_ if (authenticationType === 'jwt') { _%>
+      <%_ if (clientFramework === 'angularX') { _%>
+    let auth = window.sessionStorage.getItem('jhi-authenticationtoken');
+    auth = auth !== null ? auth.replace('"', '') : null;
+      <%_ } else { _%>
     const auth = window.sessionStorage.getItem('jhi-authenticationToken');
+      <%_ } _%>
     <%_ } else if (authenticationType === 'session') { _%>
     cy.getXsrfToken().then((cookie: any) => {
     <%_ } _%>
@@ -113,8 +121,8 @@ Cypress.Commands.add('cleanUsers', () => {
       }
     <%_ } _%>
     }).then(response => {
-        // TODO: replace any by correct type
-        response.body.forEach((user: any) => {
+      // TODO: replace any by correct type
+      response.body.forEach((user: any) => {
         if (!['user', 'admin', 'system'].includes(user.login)) {
           cy.request({
             method: 'DELETE',
@@ -130,7 +138,7 @@ Cypress.Commands.add('cleanUsers', () => {
           <%_ } _%>
           });
         }
-      });<%_ if (authenticationType === 'session') { _%> }); <%_ } _%>
+      });<%_ if (authenticationType === 'session') { _%> }); <% } %>
     });
   });
   cy.logout();
