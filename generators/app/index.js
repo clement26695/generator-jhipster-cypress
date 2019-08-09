@@ -70,7 +70,7 @@ module.exports = class extends BaseGenerator {
 
         // Add entity-client hook
         try {
-            this.registerModule('generator-jhipster-cypress', 'entity-client', 'post', 'entity-client', '');
+            this.registerModule('generator-jhipster-cypress', 'entity', 'post', 'entity-client', '');
             this.registerModule('generator-jhipster-cypress', 'client', 'post', 'client', '');
         } catch (err) {
             this.log(`${chalk.red.bold('WARN!')} Could not register as a jhipster entity post creation hook...\n`);
