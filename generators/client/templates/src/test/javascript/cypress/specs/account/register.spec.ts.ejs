@@ -33,7 +33,7 @@ describe('Register', () => {
     // TODO: Move logout to support ? It would run before each test
     cy.logout();
     <%_ if (authenticationType !== 'session') { _%>
-    cy.visit('/register');
+    cy.visit('/account/register');
     <%_ } else { _%>
     cy.visit('/');
     cy.clickOnRegisterItem();

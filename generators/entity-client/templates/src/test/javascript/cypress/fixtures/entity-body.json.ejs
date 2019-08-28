@@ -1,27 +1,31 @@
 {
-    <%_ fields.forEach(field => {
-      const fieldName = field.fieldName;
-      const fieldType = field.fieldType;
-      const fieldTypeBlobContent = field.fieldTypeBlobContent;
-      const fieldIsEnum = field.fieldIsEnum;
-    _%>
-        <%_ if (['Integer', 'Long', 'Float', 'Double', 'BigDecimal', 'Duration'].includes(fieldType)) { _%>
-          "<%= fieldName %>": 5,
-        <%_ } else if (fieldType === 'LocalDate') { _%>
-          "<%= fieldName %>": "2001-01-01",
-        <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
-          "<%= fieldName %>": "2001-01-01T02:30:00.000Z",
-        <%_ } else if (fieldType === 'Boolean') { _%>
-          "<%= fieldName %>": true,
-        <%_ } else if (['byte[]', 'ByteBuffer'].includes(fieldType) && fieldTypeBlobContent !== 'text') { _%>
-          "<%= fieldName %>": "iVBORw0KGgoAAAANSUhEUgAAAGYAAAAqCAYAAABBRS51AAAACXBIWXMAAAsSAAALEgHS3X78AAAD70lEQVR4nO2czY7SUBTHf5hxPWOMKxMH94r1BTrtE4hLVoNPICbSuJPZwgafQGYjW+YJyvAEQOIeHsAocetMXdxbLJ1SCvTjXpxf0gRKaQ/995xzvw4lz/PYhkqzfwIYod2/pp3aeKsTHSh2e2QAJxEfjV3H/JX0PKUkwlSa/SpQByzgOObQOTADhsAYGE87tVlSY3TDbo8sxD0x5Ha64StzYAB0XcecxR0YK0yl2S8DPeAsmamxxgynndpgj/MUjvSGKkKMfe7JAmi4jtlbd8BaYaQoY+I9ZBeuEEINpp1aYtcuCilGHSHIJo/YlnfrxIkTZsh+T0USroCeap5kt0dloEE2YoR5HhXWIoWpNPsW4GZsUJAFImT2impE2O3RCUKIBvAqx0tfuo5ZD+88WnNwNVtb7nAMvAfeV5r9CdCddmq9PC4svaOF+M1ph+0kRN7rdR4zJt+nJgrfi7pZtOzs9sj3jqzDdRJeu465EinuCCP7KT/ztCoBl4gwN9znJIFw1SL73LENH1zH7AZ3RIUyKx9btuIcOK80+9cID9qqsSAFacitiHC1CQvQUhifM+Cs0uzPgdamPKSBID5WeEdUKFMhvyQlUqBAQj/P36SdWckzK8Ioml+SMAdaj588HSBCgk6C+KzkmQehD618bUmNU+Cr53k/0FMUCN37QxEGgFKpFP49OmEF34R/SHg4/578OJbjcsBdYVTobP3PWP6LpTByfOyeYrH8Fw+iduqI3ullSWQos/K3Iz2Ojh4WbUIanMo+2Iow94lfDQyQwsjZSpWHLP4n/gnDvbeohAUHJMzt7c3v29ub70XbkQIH5TFfbm7+PLv+ZL8APiAm2XTl2G6PTnxhohao6cAEsKedWsNfcSMHAg3EQg9dMUqe51Fp9rdbjlk8C8RwfzfuILkgr4das5VJeKtjr+wKMDaJAuA65tB1zDJwgV7hzSi9/PhNlzmYCdDYdd5fdty6wJsUbcqKiyPUT/yJwtYm5KK6qi7hTfVQ9gUo7ytKkEB4U7r1pmryv0R4ySzLiwQWa3zO8jo7cKGaMNcIQYZ5XlTBxRtLYYpeGVOIIGEUEsj2hekVZIwSgoSRDYQWxc3oPvKFsch3db+SgoSRc/AN8n1or1zHrC7XleVYD9NVXZAwOYc423XMYVAYA1E7mfa8zAJRQZZ5KytrAq24Otn0g5a1MuGVmGmKM0H0tLUo6dsWuz2qIyoH0hpJWClgilq7XGb3gtiJ/O5Ad+9IigxzflX3Li3bBaKKuRXcGVeDmaQodI7wsCGiKnm2g2EHgxTJCmxx4c5/iHtR9f9J6/zv/OmCbgm8CGROihqL3PhnDH8BhXKcPkWMlDAAAAAASUVORK5CYII=",
-          '<%= fieldName %>ContentType': "image/png",
-        <%_ } else if (fieldType === 'UUID'){ _%>
-          "<%= fieldName %>": "64c99148-3908-465d-8c4a-e510e3ade974",
-        <%_ } else if (fieldIsEnum){ _%>
-          "<%= fieldName %>": "<%= field.fieldValues.replace(/\s/g, '').split(',')[0] %>",
-        <%_ } else { _%>
-          "<%= fieldName %>": "<%= fieldName %>",
-        <%_ } _%>
-    <%_ }); // TODO: deal with relationships _%>
+<%_
+const fieldLength = fields.length;
+
+fields.forEach((field, idx) => {
+  const fieldName = field.fieldName;
+  const fieldType = field.fieldType;
+  const fieldTypeBlobContent = field.fieldTypeBlobContent;
+  const fieldIsEnum = field.fieldIsEnum;
+  const optionalComma = idx === fieldLength - 1 ? '' : ',';
+_%>
+    <%_ if (['Integer', 'Long', 'Float', 'Double', 'BigDecimal', 'Duration'].includes(fieldType)) { _%>
+  "<%= fieldName %>": 5<%= optionalComma %>
+    <%_ } else if (fieldType === 'LocalDate') { _%>
+  "<%= fieldName %>": "2001-01-01"<%= optionalComma %>
+    <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
+  "<%= fieldName %>": "2001-01-01T02:30:00.000Z"<%= optionalComma %>
+    <%_ } else if (fieldType === 'Boolean') { _%>
+  "<%= fieldName %>": true<%= optionalComma %>
+    <%_ } else if (['byte[]', 'ByteBuffer'].includes(fieldType) && fieldTypeBlobContent !== 'text') { _%>
+  "<%= fieldName %>": "iVBORw0KGgoAAAANSUhEUgAAAGYAAAAqCAYAAABBRS51AAAACXBIWXMAAAsSAAALEgHS3X78AAAD70lEQVR4nO2czY7SUBTHf5hxPWOMKxMH94r1BTrtE4hLVoNPICbSuJPZwgafQGYjW+YJyvAEQOIeHsAocetMXdxbLJ1SCvTjXpxf0gRKaQ/995xzvw4lz/PYhkqzfwIYod2/pp3aeKsTHSh2e2QAJxEfjV3H/JX0PKUkwlSa/SpQByzgOObQOTADhsAYGE87tVlSY3TDbo8sxD0x5Ha64StzYAB0XcecxR0YK0yl2S8DPeAsmamxxgynndpgj/MUjvSGKkKMfe7JAmi4jtlbd8BaYaQoY+I9ZBeuEEINpp1aYtcuCilGHSHIJo/YlnfrxIkTZsh+T0USroCeap5kt0dloEE2YoR5HhXWIoWpNPsW4GZsUJAFImT2impE2O3RCUKIBvAqx0tfuo5ZD+88WnNwNVtb7nAMvAfeV5r9CdCddmq9PC4svaOF+M1ph+0kRN7rdR4zJt+nJgrfi7pZtOzs9sj3jqzDdRJeu465EinuCCP7KT/ztCoBl4gwN9znJIFw1SL73LENH1zH7AZ3RIUyKx9btuIcOK80+9cID9qqsSAFacitiHC1CQvQUhifM+Cs0uzPgdamPKSBID5WeEdUKFMhvyQlUqBAQj/P36SdWckzK8Ioml+SMAdaj588HSBCgk6C+KzkmQehD618bUmNU+Cr53k/0FMUCN37QxEGgFKpFP49OmEF34R/SHg4/578OJbjcsBdYVTobP3PWP6LpTByfOyeYrH8Fw+iduqI3ullSWQos/K3Iz2Ojh4WbUIanMo+2Iow94lfDQyQwsjZSpWHLP4n/gnDvbeohAUHJMzt7c3v29ub70XbkQIH5TFfbm7+PLv+ZL8APiAm2XTl2G6PTnxhohao6cAEsKedWsNfcSMHAg3EQg9dMUqe51Fp9rdbjlk8C8RwfzfuILkgr4das5VJeKtjr+wKMDaJAuA65tB1zDJwgV7hzSi9/PhNlzmYCdDYdd5fdty6wJsUbcqKiyPUT/yJwtYm5KK6qi7hTfVQ9gUo7ytKkEB4U7r1pmryv0R4ySzLiwQWa3zO8jo7cKGaMNcIQYZ5XlTBxRtLYYpeGVOIIGEUEsj2hekVZIwSgoSRDYQWxc3oPvKFsch3db+SgoSRc/AN8n1or1zHrC7XleVYD9NVXZAwOYc423XMYVAYA1E7mfa8zAJRQZZ5KytrAq24Otn0g5a1MuGVmGmKM0H0tLUo6dsWuz2qIyoH0hpJWClgilq7XGb3gtiJ/O5Ad+9IigxzflX3Li3bBaKKuRXcGVeDmaQodI7wsCGiKnm2g2EHgxTJCmxx4c5/iHtR9f9J6/zv/OmCbgm8CGROihqL3PhnDH8BhXKcPkWMlDAAAAAASUVORK5CYII=",
+  '<%= fieldName %>ContentType': "image/png"<%= optionalComma %>
+    <%_ } else if (fieldType === 'UUID'){ _%>
+  "<%= fieldName %>": "64c99148-3908-465d-8c4a-e510e3ade974"<%= optionalComma %>
+    <%_ } else if (fieldIsEnum){ _%>
+  "<%= fieldName %>": "<%= field.fieldValues.replace(/\s/g, '').split(',')[0] %>"<%= optionalComma %>
+    <%_ } else { _%>
+  "<%= fieldName %>": "<%= fieldName %>"<%= optionalComma %>
+    <%_ } _%>
+<%_ }); // TODO: deal with relationships _%>
 }

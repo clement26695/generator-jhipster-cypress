@@ -50,7 +50,6 @@ import { datetimeToMinutes } from '../../support/utils';
 <%_
 const baseApi = (applicationType === 'gateway' && locals.microserviceName) ? microserviceName.toLowerCase() + '/api/' : 'api/';
 _%>
-
 describe('<%= entityClass %> e2e test', () => {
   let startingEntitiesCount = 0;
   let entityToDelete: number[] = [];
@@ -62,17 +61,25 @@ describe('<%= entityClass %> e2e test', () => {
       cy.wait('@accountRequest');
 
       // TODO: handle OAuth2
-      cy.request({
-        method: 'GET',
-        url: '/<%= baseApi + entityApiUrl %>',
-        auth: {
-          bearer: window.sessionStorage.getItem('jhi-authenticationToken')
-        }
-      })
-        .its('body')
-        .then(entities => {
-          startingEntitiesCount = entities.length;
-        });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+      cy.getJHiAuthenticationToken().then((token: String) => {
+    <%_ } _%>
+        cy.request({
+          method: 'GET',
+          url: '/<%= baseApi + entityApiUrl %>',
+          <%_ if (authenticationType === 'jwt') { _%>
+          auth: {
+            bearer: <% if (clientFramework === 'angularX') { %>token <%_ } else { _%>window.sessionStorage.getItem('jhi-authenticationToken')<% } %>
+          }
+          <%_ } _%>
+        })
+          .its('body')
+          .then(entities => {
+            startingEntitiesCount = entities.length;
+          });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+      });
+    <%_ } _%>
     });
 <%_ if (fieldsContainBlobOrImage) { _%>
     cy.fixture('integration-test.png').as('imageContent');
@@ -107,16 +114,12 @@ describe('<%= entityClass %> e2e test', () => {
 
     cy.get(<%= entityInstance%>EditPageSelector)
       .find(<%= entityInstance%>EditTitleSelector)
-<%_ if (enableTranslation) { _%>
-      // TODO: to remove ?
-      .invoke('attr', 'id')
-      .should('match', /<%= i18nKeyPrefix %>.home.createOrEditLabel/);
-<%_ } else { _%>
+<%_ if (!enableTranslation) { _%>
       .contains('Create or edit a <%= entityAngularName %>');
 <%_ } _%>
   });
 
-   it('should create and save <%= entityClassPlural %>', function() {
+  it('should create and save <%= entityClassPlural %>', function() {
     cy.server();
     cy.route('POST', '/<%= baseApi + entityApiUrl %>').as('saveEntityRequest');
 
@@ -179,7 +182,8 @@ describe('<%= entityClass %> e2e test', () => {
 
     <%_ } else { _%>
       .type('<%= fieldName %>')
-      .invoke('val').should('match', /<%= fieldName %>/);
+      .invoke('val')
+      .should('match', /<%= fieldName %>/);
 
     <%_ } _%>
     <%_ }); _%>
@@ -189,12 +193,13 @@ describe('<%= entityClass %> e2e test', () => {
       const relationshipName = relationship.relationshipName; _%>
     <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
     // <%= entityClass %>UpdatePage.<%=relationshipName %>SelectLastOption();
+
     <%_ } else if ((relationshipType === 'many-to-many' && ownerSide === true)) { _%>
     // <%= entityClass %>UpdatePage.<%=relationshipName %>SelectLastOption();
+
     <%_ } _%>
     <%_ }); _%>
-
-     cy.get(<%= entityInstance%>EditPageSelector)
+    cy.get(<%= entityInstance%>EditPageSelector)
       .find(<%= entityInstance%>EditSaveSelector)
       .click();
 
@@ -210,17 +215,25 @@ describe('<%= entityClass %> e2e test', () => {
     // Success toast should appear
     cy.getSuccessToast().should('exist');
 
-    cy.request({
-      method: 'GET',
-      url: '/<%= baseApi + entityApiUrl %>',
-      auth: {
-        bearer: window.sessionStorage.getItem('jhi-authenticationToken')
-      }
-    })
-      .its('body')
-      .then(entities => {
-        expect(entities.length).to.equal(startingEntitiesCount + 1);
-      });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+    cy.getJHiAuthenticationToken().then((token: String) => {
+    <%_ } _%>
+      cy.request({
+        method: 'GET',
+        url: '/<%= baseApi + entityApiUrl %>',
+        <%_ if (authenticationType === 'jwt') { _%>
+        auth: {
+          bearer: <% if (clientFramework === 'angularX') { %>token <%_ } else { _%>window.sessionStorage.getItem('jhi-authenticationToken')<% } %>
+        }
+        <%_ } _%>
+      })
+        .its('body')
+        .then(entities => {
+          expect(entities.length).to.equal(startingEntitiesCount + 1);
+        });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+    });
+    <%_ } _%>
   });
 
   it('should load details <%= entityClass %> page and fetch data', function() {
@@ -255,17 +268,25 @@ describe('<%= entityClass %> e2e test', () => {
       .find(<%= entityInstance%>DetailsBackSelector)
       .click();
 
-    cy.request({
-      method: 'GET',
-      url: '/<%= baseApi + entityApiUrl %>',
-      auth: {
-        bearer: window.sessionStorage.getItem('jhi-authenticationToken')
-      }
-    })
-      .its('body')
-      .then(entities => {
-        expect(entities.length).to.equal(startingEntitiesCount + 1);
-      });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+    cy.getJHiAuthenticationToken().then((token: String) => {
+    <%_ } _%>
+      cy.request({
+        method: 'GET',
+        url: '/<%= baseApi + entityApiUrl %>',
+        <%_ if (authenticationType === 'jwt') { _%>
+        auth: {
+          bearer: <% if (clientFramework === 'angularX') { %>token <%_ } else { _%>window.sessionStorage.getItem('jhi-authenticationToken')<% } %>
+        }
+        <%_ } _%>
+      })
+        .its('body')
+        .then(entities => {
+          expect(entities.length).to.equal(startingEntitiesCount + 1);
+        });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+    });
+    <%_ } _%>
   });
 
   it('should load edit <%= entityClass %> page and fetch data', function() {
@@ -341,15 +362,17 @@ describe('<%= entityClass %> e2e test', () => {
 
     <%_ } _%>
     <%_ }); _%>
-
     cy.get(<%= entityInstance%>EditPageSelector)
       .find(<%= entityInstance%>EditSaveSelector)
       .click();
 
     cy.get(<%= entityInstance%>EditPageSelector).should('not.exist');
 
-    // Info toast should appear
+    <%_ if (clientFramework === 'vue') { _%>
     cy.getInfoToast().should('exist');
+    <%_ } else { _%>
+    cy.getSuccessToast().should('exist');
+    <%_ } _%>
   });
 
   it('should delete last <%= entityClass %>', function() {
@@ -368,34 +391,49 @@ describe('<%= entityClass %> e2e test', () => {
       .last()
       .click();
 
-     cy.get(<%= entityInstance%>DeleteModalSelector)
+    cy.get(<%= entityInstance%>DeleteModalSelector)
       .find(<%= entityInstance%>DeleteBodySelector)
-      .should('be.visible')
+      .should('be.visible');
 
     cy.get(<%= entityInstance%>DeleteModalSelector)
       .find(<%= entityInstance%>DeleteConfirmSelector)
       .click();
 
     // Delete modal should disappear
+    <%_ if (clientFramework === 'vue') { _%>
     cy.get(<%= entityInstance%>DeleteModalSelector)
       .find(<%= entityInstance%>DeleteBodySelector)
       .should('not.be.visible');
+    <%_ } else { _%>
+    cy.get(<%= entityInstance%>DeleteModalSelector).should('not.exist');
+    <%_ } _%>
 
-    cy.request({
-      method: 'GET',
-      url: '/<%= baseApi + entityApiUrl %>',
-      auth: {
-        bearer: window.sessionStorage.getItem('jhi-authenticationToken')
-      }
-    })
-      .its('body')
-      .then(entities => {
-        expect(entities.length).to.equal(startingEntitiesCount);
-        entityToDelete = [];
-      });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+    cy.getJHiAuthenticationToken().then((token: String) => {
+    <%_ } _%>
+      cy.request({
+        method: 'GET',
+        url: '/<%= baseApi + entityApiUrl %>',
+        <%_ if (authenticationType === 'jwt') { _%>
+        auth: {
+          bearer: <% if (clientFramework === 'angularX') { %>token <%_ } else { _%>window.sessionStorage.getItem('jhi-authenticationToken')<% } %>
+        }
+        <%_ } _%>
+      })
+        .its('body')
+        .then(entities => {
+          expect(entities.length).to.equal(startingEntitiesCount);
+          entityToDelete = [];
+        });
+    <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+    });
+    <%_ } _%>
 
-    // Danger toast should appear
+    <%_ if (clientFramework === 'vue') { _%>
     cy.getDangerToast().should('exist');
+    <%_ } else { _%>
+    cy.getSuccessToast().should('exist');
+    <%_ } _%>
   });
 
   afterEach(() => {

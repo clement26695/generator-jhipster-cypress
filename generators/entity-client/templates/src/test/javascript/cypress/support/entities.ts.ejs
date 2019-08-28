@@ -20,39 +20,57 @@ limitations under the License.
 const baseApi = (applicationType === 'gateway' && locals.microserviceName) ? microserviceName.toLowerCase() + '/api/' : 'api/';
 _%>
 Cypress.Commands.add('createEntity', (entityName: string, body: any) => {
-  return <% if (authenticationType === 'session') { %> cy.getXsrfToken().then((cookie: any) => { <%_ } _%>cy.request({
-    method: 'POST',
-    url: `/<%= baseApi %>${entityName}`,
-    body,
+<%_ if (authenticationType === 'session') { _%>
+  return cy.getXsrfToken().then((cookie: any) => {
+    cy.request({
+<%_ } else if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+  return cy.getJHiAuthenticationToken().then((token: String) => {
+    cy.request({
+<%_ } else { _%>
+  return cy.request({
+<%_ } _%>
+      method: 'POST',
+      url: `/<%= baseApi %>${entityName}`,
+      body,
   <%_ if (authenticationType === 'jwt') { _%>
-    auth: {
-      bearer: window.sessionStorage.getItem('jhi-authenticationToken')
-    }
+      auth: {
+        bearer: <% if (clientFramework === 'angularX') { %>token<%_ } else { _%>window.sessionStorage.getItem('jhi-authenticationToken')<% } %>
+      }
+      <%_ if (clientFramework === 'angularX') { _%>
+    });
+      <%_ } _%>
   <%_ } else if (authenticationType === 'session') { _%>
-    headers: {
-      'X-XSRF-TOKEN': cookie.value
-    }
-  });
+      headers: {
+        'X-XSRF-TOKEN': cookie.value
+      }
+    });
   <%_ } _%>
   });
 });
 
 Cypress.Commands.add('cleanEntity', (entityName: string, ids: number[]) => {
-  <%_ if (authenticationType === 'session') { _%> cy.getXsrfToken().then((cookie: any) => { <%_ } _%>
-  ids.forEach(id => {
-    cy.request({
-      method: 'DELETE',
-      url: `/<%= baseApi %>${entityName}/${id}`,
-    <%_ if (authenticationType === 'jwt') { _%>
-      auth: {
-        bearer: window.sessionStorage.getItem('jhi-authenticationToken')
-      }
-    <%_ } else if (authenticationType === 'session') { _%>
-      headers: {
-        'X-XSRF-TOKEN': cookie.value
-      }
-    });
-    <%_ } _%>
+<%_ if (authenticationType === 'session') { _%>
+  cy.getXsrfToken().then((cookie: any) => {
+<%_ } else if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
+  cy.getJHiAuthenticationToken().then((token: String) => {
+<%_ } _%>
+    ids.forEach(id => {
+      cy.request({
+        method: 'DELETE',
+        url: `/<%= baseApi %>${entityName}/${id}`,
+      <%_ if (authenticationType === 'jwt') { _%>
+        auth: {
+          bearer: <% if (clientFramework === 'angularX') { %>token<%_ } else { _%>window.sessionStorage.getItem('jhi-authenticationToken')<% } %>
+        }
+        <%_ if (clientFramework === 'angularX') { _%>
+      });
+        <%_ } _%>
+      <%_ } else if (authenticationType === 'session') { _%>
+        headers: {
+          'X-XSRF-TOKEN': cookie.value
+        }
+      });
+      <%_ } _%>
     });
   });
 });

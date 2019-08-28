@@ -55,6 +55,6 @@ module.exports = {
 };
 
 function writeFiles() {
-    // this.writeFilesToDisk(cypressFiles, this, false, '');
+    this.writeFilesToDisk(cypressFiles, this, false, '');
     this.addEntitySupportFileToIndex();
 }

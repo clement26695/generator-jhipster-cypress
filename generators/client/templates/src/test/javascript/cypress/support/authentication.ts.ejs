@@ -108,14 +108,24 @@ Cypress.Commands.add('getXsrfToken', () => {
 });
 
 <%_ } /* TODO: add for OAuth2 */ _%>
-
+<%_ if (clientFramework === 'angularX') { _%>
+Cypress.Commands.add('getJHiAuthenticationToken', () => {
+  const auth = window.sessionStorage.getItem('jhi-authenticationtoken');
+  return auth !== null ? auth.replace('"', '') : null;
+});
+<%_ } _%>
 declare global {
   namespace Cypress {
     interface Chainable<Subject> {
       logout(): void;
       loginUsing(username: string, password: string): Cypress.Chainable;
       loginWithAdmin(): Cypress.Chainable;
+      <%_ if (authenticationType === 'session') { _%>
       getXsrfToken(): Cypress.Chainable<Cookie | null>;
+      <%_ } _%>
+      <%_ if (clientFramework === 'angularX') { _%>
+      getJHiAuthenticationToken(): Cypress.Chainable<String>;
+      <%_ } _%>
     }
   }
 }
