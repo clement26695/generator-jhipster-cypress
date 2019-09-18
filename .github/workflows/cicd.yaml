@@ -36,11 +36,6 @@ jobs:
         docker-compose version
         yo --version
     - name: TOOLS -> install JHipster lib
-      run : |
-        ls -alh
-        pwd
-        echo $HOME
-    - name: TOOLS -> install JHipster lib
       run: |
         cd $HOME
         git clone https://github.com/jhipster/jhipster.git jhipster
@@ -70,8 +65,7 @@ jobs:
         cd $HOME/jhipster-app
         npm link generator-jhipster-cypress
         yo jhipster-cypress
-        yo jhipster-cypress:client
-        yo jhipster-cypress:entity-client
+        jhipster --force --with-entities
     - name: GENERATION -> jhipster info
       run: |
         cd $JHIPSTER_FOLDER_APP
