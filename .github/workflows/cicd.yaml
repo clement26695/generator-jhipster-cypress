@@ -23,6 +23,9 @@ jobs:
         sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
         sudo apt update
         sudo apt install google-chrome-stable
+    - name: TOOLS -> install yo
+      run: |
+        npm install -g yo
     - name: TOOLS -> display tools
       run: |
         git version
@@ -31,12 +34,15 @@ jobs:
         npm -v
         docker version
         docker-compose version
+        yo --version
     - name: TOOLS -> install JHipster lib
       run : |
         ls -alh
         pwd
+        echo $HOME
     - name: TOOLS -> install JHipster lib
       run: |
+        cd $HOME
         git clone https://github.com/jhipster/jhipster.git jhipster
         cd jhipster
         ./mvnw -ntp clean install -DskipTests -Dmaven.javadoc.skip=true -Dgpg.skip=true
@@ -47,14 +53,33 @@ jobs:
         cd generator-jhipster
         npm ci
         npm link
+    - name: TOOLS -> install generator-jhipster-cypress
+      run: |
+        cd $GITHUB_WORKSPACE
+        npm ci
+        npm link
 
     - name: GENERATION -> generate sample app
       run: |
-        echo "Rien pour l instant"
+        cd $HOME
+        mkdir jhipster-app && cd jhipster-app
+        cp $GITHUB_WORKSPACE/test-integration/samples/default-angular.jdl .
+        jhipster import-jdl default-angular.jdl
     - name: GENERATION -> generate cypress files
       run: |
-        echo "Rien pour l instant"
+        cd $HOME/jhipster-app
+        npm link generator-jhipster-cypress
+        yo jhipster-cypress
+        yo jhipster-cypress:client
+        yo jhipster-cypress:entity-client
     - name: GENERATION -> jhipster info
       run: |
         cd $JHIPSTER_FOLDER_APP
         jhipster info
+
+    - name: TESTS -> Start docker-compose containers
+      run: $GITHUB_WORKSPACE/test-integration/scripts/20-docker-compose.sh
+    - name: TESTS -> packaging
+      run: $GITHUB_WORKSPACE/test-integration/scripts/23-package.sh
+    - name: TESTS -> E2E
+      run: $GITHUB_WORKSPACE/test-integration/scripts/24-tests-e2e.sh
