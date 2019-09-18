@@ -64,7 +64,7 @@ jobs:
         cd $HOME
         mkdir jhipster-app && cd jhipster-app
         cp $GITHUB_WORKSPACE/test-integration/samples/default-angular.jdl .
-        jhipster import-jdl default-angular.jdl
+        jhipster import-jdl default-angular.jdl --no-insight
     - name: GENERATION -> generate cypress files
       run: |
         cd $HOME/jhipster-app
