@@ -9,9 +9,52 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
+    - name: Use Node.js 10.16.3
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.16.3
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: TOOLS -> install google-chrome-stable
       run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+        sudo apt update
+        sudo apt install google-chrome-stable
+    - name: TOOLS -> display tools
+      run: |
+        git version
+        java -version
+        node -v
+        npm -v
+        docker version
+        docker-compose version
+    - name: TOOLS -> install JHipster lib
+      run : |
+        ls -alh
+        pwd
+    - name: TOOLS -> install JHipster lib
+      run: |
+        git clone https://github.com/jhipster/jhipster.git jhipster
+        cd jhipster
+        ./mvnw -ntp clean install -DskipTests -Dmaven.javadoc.skip=true -Dgpg.skip=true
+    - name: TOOLS -> install JHipster generator
+      run: |
+        cd $HOME
+        git clone https://github.com/jhipster/generator-jhipster.git generator-jhipster
+        cd generator-jhipster
+        npm ci
+        npm link
+
+    - name: GENERATION -> generate sample app
+      run: |
+        echo "Rien pour l instant"
+    - name: GENERATION -> generate cypress files
+      run: |
+        echo "Rien pour l instant"
+    - name: GENERATION -> jhipster info
+      run: |
+        cd $JHIPSTER_FOLDER_APP
+        jhipster info
