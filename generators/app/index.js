@@ -54,7 +54,7 @@ module.exports = class extends BaseGenerator {
 
     writing() {
         // Update package.json
-        const path = 'package.json';
+        let path = 'package.json';
         const packageJSON = this.fs.readJSON(path);
 
         // Add cypress dependencies to package.json
@@ -67,6 +67,19 @@ module.exports = class extends BaseGenerator {
         packageJSON.scripts['e2e:cypress:headless'] = 'cypress run';
 
         jsonfile.writeFileSync(path, packageJSON);
+
+        path = 'tsconfig.json';
+        const tsconfigJSON = this.fs.readJSON(path);
+
+        tsconfigJSON.exclude.push("src/test/javascript/cypress");
+        jsonfile.writeFileSync(path, tsconfigJSON);
+
+        if (this.clientFramework === 'angularX') {
+            path = 'tsconfig-aot.json';
+            const tsconfigAotJSON = this.fs.readJSON(path);
+            tsconfigAotJSON.exclude = ["src/test/javascript/cypress"];
+            jsonfile.writeFileSync(path, tsconfigAotJSON);
+        }
 
         // Add entity-client hook
         try {
