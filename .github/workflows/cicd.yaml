@@ -76,6 +76,7 @@ jobs:
       run: |
         cd $HOME/$JHIPSTER_FOLDER_APP
         cp $GITHUB_WORKSPACE/test-integration/samples/$JHI_APP/entities.jdl .
+        npm link generator-jhipster-cypress
         jhipster import-jdl entities.jdl --force --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
@@ -96,11 +97,11 @@ jobs:
     - name: TESTS -> packaging
       run: $GITHUB_WORKSPACE/test-integration/scripts/23-package.sh
       env:
-        JHI_PROFILE: prod
+        JHI_PROFILE: prod,swagger
         JHIPSTER_FOLDER_APP: jhipster-app
     - name: TESTS -> E2E
       run: $GITHUB_WORKSPACE/test-integration/scripts/24-tests-e2e.sh
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
-        JHI_PROFILE: prod
+        JHI_PROFILE: prod,swagger
         JHI_APP: jdl-default
