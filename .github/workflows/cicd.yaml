@@ -72,7 +72,7 @@ jobs:
       run: |
         cd $HOME/$JHIPSTER_FOLDER_APP
         cp $GITHUB_WORKSPACE/test-integration/samples/$JHI_APP/entities.jdl .
-        jhipster import-jdl entities.jdl --no-insight
+        jhipster import-jdl entities.jdl --force --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
         JHI_APP: default-angular
@@ -93,6 +93,7 @@ jobs:
       run: $GITHUB_WORKSPACE/test-integration/scripts/23-package.sh
       env:
         JHI_PROFILE: prod
+        JHIPSTER_FOLDER_APP: jhipster-app
     - name: TESTS -> E2E
       run: $GITHUB_WORKSPACE/test-integration/scripts/24-tests-e2e.sh
       env:
