@@ -1,0 +1,139 @@
+entity BankAccount {
+  name String required,
+  bankNumber Integer,
+  agencyNumber Long,
+  lastOperationDuration Float,
+  meanOperationDuration Double,
+  balance BigDecimal required,
+  openingDay LocalDate,
+  lastOperationDate Instant,
+  active Boolean,
+  accountType BankAccountType,
+  attachment AnyBlob,
+  description TextBlob
+}
+entity TheLabel {
+  labelName String required minlength(3)
+}
+entity Operation {
+  date Instant required,
+  description String,
+  amount BigDecimal required
+}
+entity Department {
+  name String required,
+  description TextBlob,
+  advertisement AnyBlob,
+  logo ImageBlob
+}
+/**
+ * JobHistory comment.
+ */
+entity JobHistory {
+  startDate ZonedDateTime,
+  endDate ZonedDateTime,
+  language Language
+}
+entity Job {
+  title String minlength(5) maxlength(25),
+  type JobType,
+  minSalary Long,
+  maxSalary Long
+}
+/**
+ * The Employee entity.\nSecond line in javadoc.
+ */
+entity Employee {
+  /**
+   * The firstname attribute.
+   */
+  firstName String,
+  lastName String,
+  email String,
+  phoneNumber String,
+  hireDate ZonedDateTime,
+  salary Long,
+  commissionPct Long
+}
+entity Location {
+  streetAddress String,
+  postalCode String,
+  city String,
+  stateProvince String
+}
+entity Task {
+  title String,
+  description String
+}
+entity GoldenBadge {
+  name String
+}
+entity SilverBadge {
+  name String
+}
+entity Identifier {
+  name String required unique
+}
+entity Country {
+  name String
+}
+entity Region {
+  name String
+}
+enum BankAccountType {
+  CHECKING,
+  SAVINGS,
+  LOAN
+}
+enum Language {
+  FRENCH,
+  ENGLISH,
+  SPANISH
+}
+enum JobType {
+  BOSS,
+  SLAVE
+}
+
+relationship OneToOne {
+  Department{location} to Location,
+  Employee{user(login)} to User with jpaDerivedIdentifier
+}
+relationship OneToMany {
+  BankAccount{operation} to Operation{bankAccount(name)},
+  Employee{job} to Job{emp(lastName)},
+  /**
+   * A relationship
+   */
+  Department{employee} to
+  /**
+   * Another side of the same relationship,
+   */
+  Employee{department},
+  Location{country} to Country{location},
+  Country{area} to Region{country}
+}
+relationship ManyToOne {
+  BankAccount{user(login)} to User,
+  Employee{manager(lastName)} to Employee,
+  Employee{sibag(name) required} to SilverBadge,
+  Employee{gobag(name) required} to GoldenBadge,
+  GoldenBadge{iden(name) required} to Identifier,
+  SilverBadge{iden(name) required} to Identifier
+}
+relationship ManyToMany {
+  Operation{theLabel(labelName)} to TheLabel{operation},
+  JobHistory{department} to Department{jobHistory},
+  JobHistory{job} to Job{history},
+  JobHistory{emp(firstName)} to Employee{history},
+  Job{chore(title)} to Task{linkedJob(title)}
+}
+
+dto BankAccount, Department, Employee, Location, GoldenBadge, SilverBadge, Identifier, Country, Region with mapstruct
+service BankAccount, Location, Country with serviceImpl
+service TheLabel, Department, Employee, GoldenBadge, SilverBadge, Identifier, Region with serviceClass
+angularSuffix BankAccount with mySuffix
+filter BankAccount, Employee
+clientRootFolder BankAccount, TheLabel, Operation with test-root
+paginate TheLabel, Job with pagination
+paginate Operation, JobHistory, Employee with infinite-scroll

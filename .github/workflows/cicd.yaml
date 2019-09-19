@@ -6,6 +6,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        jhi_app: ["default-angular", "default-react"]
+
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js 10.16.3
@@ -64,7 +68,7 @@ jobs:
         jhipster import-jdl app.jdl --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
-        JHI_APP: default-angular
+        JHI_APP: ${{ matrix.jhi_app }}
     - name: GENERATION -> generate cypress files
       run: |
         cd $HOME/$JHIPSTER_FOLDER_APP
@@ -81,7 +85,7 @@ jobs:
         jhipster import-jdl entities.jdl --force --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
-        JHI_APP: default-angular
+        JHI_APP: ${{ matrix.jhi_app }}
     - name: GENERATION -> jhipster info
       run: |
         cd $HOME/$JHIPSTER_FOLDER_APP
@@ -105,4 +109,4 @@ jobs:
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
         JHI_PROFILE: prod,swagger
-        JHI_APP: jdl-default
+        JHI_APP: ${{ matrix.jhi_app }}
