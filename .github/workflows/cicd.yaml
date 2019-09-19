@@ -77,6 +77,7 @@ jobs:
         cd $HOME/$JHIPSTER_FOLDER_APP
         cp $GITHUB_WORKSPACE/test-integration/samples/$JHI_APP/entities.jdl .
         npm link generator-jhipster-cypress
+        npm link generator-jhipster
         jhipster import-jdl entities.jdl --force --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
