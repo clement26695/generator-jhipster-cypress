@@ -75,6 +75,8 @@ jobs:
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
 
+    - name: TESTS -> Stop mysql service
+      run: sudo /etc/init.d/mysql stop
     - name: TESTS -> Start docker-compose containers
       run: $GITHUB_WORKSPACE/test-integration/scripts/20-docker-compose.sh
       env:
