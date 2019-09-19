@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source $(dirname $0)/00-init-env.sh
-
 #-------------------------------------------------------------------------------
 # Specific for couchbase
 #-------------------------------------------------------------------------------
@@ -38,10 +36,6 @@ launchCurlOrCypress() {
         return 1
     fi
 
-    if [ "$JHI_CYPRESS" != 1 ]; then
-        return 0
-    fi
-
     retryCount=0
     maxRetry=1
     until [ "$retryCount" -ge "$maxRetry" ]
@@ -62,56 +56,22 @@ launchCurlOrCypress() {
 #-------------------------------------------------------------------------------
 # Run the application
 #-------------------------------------------------------------------------------
-if [ "$JHI_RUN_APP" == 1 ]; then
-    if [[ "$JHI_APP" == *"uaa"* ]]; then
-        cd "$JHI_FOLDER_UAA"
-        java \
-            -jar app.jar \
-            --spring.profiles.active=dev \
-            --logging.level.ROOT=OFF \
-            --logging.level.org.zalando=OFF \
-            --logging.level.io.github.jhipster=OFF \
-            --logging.level.io.github.jhipster.sample=OFF \
-            --logging.level.io.github.jhipster.travis=OFF &
-        sleep 80
-    fi
+cd "$JHI_FOLDER_APP"
+# Run the app packaged as jar
+java \
+    -jar app.jar \
+    --spring.profiles.active="$JHI_PROFILE" \
+    --logging.level.ROOT=OFF \
+    --logging.level.org.zalando=OFF \
+    --logging.level.org.springframework.web=ERROR \
+    --logging.level.io.github.jhipster=OFF \
+    --logging.level.io.github.jhipster.sample=OFF \
+    --logging.level.io.github.jhipster.travis=OFF &
+echo $! > .pidRunJar
+sleep 40
 
-    cd "$JHI_FOLDER_APP"
-    # Run the app packaged as jar
-    java \
-        -jar app.jar \
-        --spring.profiles.active="$JHI_PROFILE" \
-        --logging.level.ROOT=OFF \
-        --logging.level.org.zalando=OFF \
-        --logging.level.org.springframework.web=ERROR \
-        --logging.level.io.github.jhipster=OFF \
-        --logging.level.io.github.jhipster.sample=OFF \
-        --logging.level.io.github.jhipster.travis=OFF &
-    echo $! > .pidRunJar
-    sleep 40
+launchCurlOrCypress
+resultRunJar=$?
+kill $(cat .pidRunJar)
 
-    launchCurlOrCypress
-    resultRunJar=$?
-    kill $(cat .pidRunJar)
-
-    # Run the app packaged as war
-    if [[ $result == 0 && "$JHI_WAR" == 1 ]]; then
-        java \
-        -jar app.war \
-        --spring.profiles.active="$JHI_PROFILE" \
-        --logging.level.ROOT=OFF \
-        --logging.level.org.zalando=OFF \
-        --logging.level.org.springframework.web=ERROR \
-        --logging.level.io.github.jhipster=OFF \
-        --logging.level.io.github.jhipster.sample=OFF \
-        --logging.level.io.github.jhipster.travis=OFF &
-        echo $! > .pidRunWar
-        sleep 40
-
-        launchCurlOrProtractor
-        resultRunWar=$?
-        kill $(cat .pidRunWar)
-    fi
-
-    exit $((resultRunJar + resultRunWar))
-fi
+exit $((resultRunJar))

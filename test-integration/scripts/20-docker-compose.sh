@@ -1,8 +1,6 @@
 #!/bin/bash
 
 set -e
-source $(dirname $0)/00-init-env.sh
-
 #-------------------------------------------------------------------------------
 # Start docker container
 #-------------------------------------------------------------------------------
@@ -41,8 +39,5 @@ if [ -a src/main/docker/mariadb.yml ]; then
 fi
 if [ -a src/main/docker/jhipster-registry.yml ]; then
     docker-compose -f src/main/docker/jhipster-registry.yml up -d
-fi
-if [ "$JHI_SONAR" = 1 ]; then
-    docker-compose -f src/main/docker/sonar.yml up -d
 fi
 docker ps -a

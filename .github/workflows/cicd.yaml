@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -56,24 +55,37 @@ jobs:
 
     - name: GENERATION -> generate sample app
       run: |
-        cd $HOME
-        mkdir jhipster-app && cd jhipster-app
+        mkdir JHIPSTER_FOLDER_APP && cd JHIPSTER_FOLDER_APP
         cp $GITHUB_WORKSPACE/test-integration/samples/default-angular.jdl .
         jhipster import-jdl default-angular.jdl --no-insight
+      env:
+        JHIPSTER_FOLDER_APP: $HOME/jhipster-app
     - name: GENERATION -> generate cypress files
       run: |
-        cd $HOME/jhipster-app
+        cd JHIPSTER_FOLDER_APP
         npm link generator-jhipster-cypress
         yo jhipster-cypress
-        jhipster --force --with-entities
+        jhipster --force --with-entities --no-insight
+      env:
+        JHIPSTER_FOLDER_APP: $HOME/jhipster-app
     - name: GENERATION -> jhipster info
       run: |
         cd $JHIPSTER_FOLDER_APP
         jhipster info
+      env:
+        JHIPSTER_FOLDER_APP: $HOME/jhipster-app
 
     - name: TESTS -> Start docker-compose containers
       run: $GITHUB_WORKSPACE/test-integration/scripts/20-docker-compose.sh
+      env:
+        JHIPSTER_FOLDER_APP: $HOME/jhipster-app
     - name: TESTS -> packaging
       run: $GITHUB_WORKSPACE/test-integration/scripts/23-package.sh
+      env:
+        JHI_PROFILE: prod
     - name: TESTS -> E2E
       run: $GITHUB_WORKSPACE/test-integration/scripts/24-tests-e2e.sh
+      env:
+        JHIPSTER_FOLDER_APP: $HOME/jhipster-app
+        JHI_PROFILE: prod
+        JHI_APP: jdl-default
