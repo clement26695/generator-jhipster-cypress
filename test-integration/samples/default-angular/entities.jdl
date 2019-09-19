@@ -1,21 +1,3 @@
-application {
-  config {
-    applicationType monolith,
-    baseName jhipsterSampleApplication,
-    packageName io.github.jhipster.sample,
-    authenticationType jwt,
-    prodDatabaseType mysql,
-    buildTool maven,
-    searchEngine false,
-    testFrameworks [gatling],
-    clientFramework angularX,
-    enableTranslation true,
-    nativeLanguage en,
-    languages [ en, fr ]
-  }
-  entities *
-}
-
 entity BankAccount {
   name String required,
   bankNumber Integer,

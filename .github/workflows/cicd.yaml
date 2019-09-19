@@ -56,16 +56,23 @@ jobs:
     - name: GENERATION -> generate sample app
       run: |
         mkdir $HOME/$JHIPSTER_FOLDER_APP && cd $HOME/$JHIPSTER_FOLDER_APP
-        cp $GITHUB_WORKSPACE/test-integration/samples/default-angular.jdl .
-        jhipster import-jdl default-angular.jdl --no-insight
+        cp $GITHUB_WORKSPACE/test-integration/samples/$JHI_APP/app.jdl .
+        jhipster import-jdl app.jdl --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
+        JHI_APP: default-angular
     - name: GENERATION -> generate cypress files
       run: |
         cd $HOME/$JHIPSTER_FOLDER_APP
         npm link generator-jhipster-cypress
         yo jhipster-cypress
-        jhipster --force --with-entities --no-insight
+      env:
+        JHIPSTER_FOLDER_APP: jhipster-app
+    - name: GENERATION -> generate entities
+      run: |
+        cd $HOME/$JHIPSTER_FOLDER_APP
+        cp $GITHUB_WORKSPACE/test-integration/samples/$JHI_APP/entities.jdl .
+        jhipster import-jdl entities.jdl --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
     - name: GENERATION -> jhipster info

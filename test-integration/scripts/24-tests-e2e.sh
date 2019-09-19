@@ -42,7 +42,7 @@ launchCurlOrCypress() {
     do
         result=0
         if [[ -f "tsconfig.json" ]]; then
-            npm run e2e
+            npm run e2e:cypress:headless
         fi
         result=$?
         [ $result -eq 0 ] && break
