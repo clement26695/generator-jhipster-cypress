@@ -4,7 +4,7 @@ set -e
 #-------------------------------------------------------------------------------
 # Start docker container
 #-------------------------------------------------------------------------------
-cd "$JHI_FOLDER_APP"
+cd "$HOME/$JHIPSTER_FOLDER_APP"
 if [ -a src/main/docker/keycloak.yml ]; then
     docker-compose -f src/main/docker/keycloak.yml up -d
 fi

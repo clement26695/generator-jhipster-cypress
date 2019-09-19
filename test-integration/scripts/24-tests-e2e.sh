@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------
 # Specific for couchbase
 #-------------------------------------------------------------------------------
-cd "$JHI_FOLDER_APP"
+cd "$HOME/$JHIPSTER_FOLDER_APP"
 if [ -a src/main/docker/couchbase.yml ]; then
     docker-compose -f src/main/docker/couchbase.yml up -d
     sleep 20
@@ -56,7 +56,7 @@ launchCurlOrCypress() {
 #-------------------------------------------------------------------------------
 # Run the application
 #-------------------------------------------------------------------------------
-cd "$JHI_FOLDER_APP"
+cd "$HOME/$JHIPSTER_FOLDER_APP"
 # Run the app packaged as jar
 java \
     -jar app.jar \
