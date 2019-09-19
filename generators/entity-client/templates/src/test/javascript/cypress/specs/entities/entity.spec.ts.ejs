@@ -57,7 +57,7 @@ describe('<%= entityClass %> e2e test', () => {
   beforeEach(function() {
     cy.logout();
     cy.loginWithAdmin().then(() => {
-      cy.visit('/entity/<%= entityFileName%>');
+      cy.visit('<% if (clientFramework !== 'angularX') { %>/entity<% } %>/<%= entityFileName%>');
       cy.wait('@accountRequest');
 
       // TODO: handle OAuth2
