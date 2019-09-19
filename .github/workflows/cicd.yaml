@@ -43,10 +43,14 @@ jobs:
     - name: TOOLS -> install JHipster generator
       run: |
         cd $HOME
-        git clone https://github.com/jhipster/generator-jhipster.git generator-jhipster
+        git clone $GENERATOR_JHIPSTER_URL generator-jhipster
         cd generator-jhipster
+        git checkout $GENERATOR_JHIPSTER_BRANCH
         npm ci
         npm link
+      env:
+        GENERATOR_JHIPSTER_URL: https://github.com/clement26695/generator-jhipster.git
+        GENERATOR_JHIPSTER_BRANCH: feature/add-e2e-selectors
     - name: TOOLS -> install generator-jhipster-cypress
       run: |
         cd $GITHUB_WORKSPACE
