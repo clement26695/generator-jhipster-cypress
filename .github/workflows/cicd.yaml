@@ -75,6 +75,7 @@ jobs:
         jhipster import-jdl entities.jdl --no-insight
       env:
         JHIPSTER_FOLDER_APP: jhipster-app
+        JHI_APP: default-angular
     - name: GENERATION -> jhipster info
       run: |
         cd $HOME/$JHIPSTER_FOLDER_APP
