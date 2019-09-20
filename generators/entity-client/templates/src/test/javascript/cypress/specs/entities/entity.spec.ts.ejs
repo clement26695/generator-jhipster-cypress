@@ -49,6 +49,16 @@ import { datetimeToMinutes } from '../../support/utils';
 
 <%_
 const baseApi = (applicationType === 'gateway' && locals.microserviceName) ? microserviceName.toLowerCase() + '/api/' : 'api/';
+
+let openBlockComment = ``;
+let closeBlockComment = ``;
+for (let relationship of relationships) {
+  if (relationship.relationshipRequired || relationship.useJPADerivedIdentifier) {
+    openBlockComment = `/* `;
+    closeBlockComment = ` */`;
+    break;
+  }
+}
 _%>
 describe('<%= entityClass %> e2e test', () => {
   let startingEntitiesCount = 0;
@@ -119,7 +129,7 @@ describe('<%= entityClass %> e2e test', () => {
 <%_ } _%>
   });
 
-  it('should create and save <%= entityClassPlural %>', function() {
+  <%= openBlockComment %>it('should create and save <%= entityClassPlural %>', function() {
     cy.server();
     cy.route('POST', '/<%= baseApi + entityApiUrl %>').as('saveEntityRequest');
 
@@ -234,9 +244,9 @@ describe('<%= entityClass %> e2e test', () => {
     <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
     });
     <%_ } _%>
-  });
+  });<%= closeBlockComment %>
 
-  it('should load details <%= entityClass %> page and fetch data', function() {
+  <%= openBlockComment %>it('should load details <%= entityClass %> page and fetch data', function() {
     // TODO: fix request body
     cy.createEntity('<%= entityApiUrl %>', this.defaultEntityBody).then(response => {
       entityToDelete.push(response.body.id);
@@ -287,9 +297,9 @@ describe('<%= entityClass %> e2e test', () => {
     <%_ if (authenticationType === 'jwt' && clientFramework === 'angularX') { _%>
     });
     <%_ } _%>
-  });
+  });<%= closeBlockComment %>
 
-  it('should load edit <%= entityClass %> page and fetch data', function() {
+  <%= openBlockComment %>it('should load edit <%= entityClass %> page and fetch data', function() {
     cy.createEntity('<%= entityApiUrl %>', this.defaultEntityBody).then(response => {
       entityToDelete.push(response.body.id);
     });
@@ -373,9 +383,9 @@ describe('<%= entityClass %> e2e test', () => {
     <%_ } else { _%>
     cy.getSuccessToast().should('exist');
     <%_ } _%>
-  });
+  });<%= closeBlockComment %>
 
-  it('should delete last <%= entityClass %>', function() {
+  <%= openBlockComment %>it('should delete last <%= entityClass %>', function() {
     cy.createEntity('<%= entityApiUrl %>', this.defaultEntityBody).then(response => {
       entityToDelete.push(response.body.id);
     });
@@ -434,7 +444,7 @@ describe('<%= entityClass %> e2e test', () => {
     <%_ } else { _%>
     cy.getSuccessToast().should('exist');
     <%_ } _%>
-  });
+  });<%= closeBlockComment %>
 
   afterEach(() => {
     cy.cleanEntity('<%= entityApiUrl %>', entityToDelete);
