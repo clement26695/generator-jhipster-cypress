@@ -39,9 +39,6 @@ Cypress.Commands.add('getInfoToast', () => cy.get('[role=alert].alert.alert-info
 Cypress.Commands.add('getDangerToast', () => cy.get('[role=alert].alert.alert-danger'));
 <%_ } _%>
 
-// Fix timezone
-export const datetimeToMinutes = (datetime: string) => new Date(datetime).valueOf() / 60000;
-
 declare global {
   namespace Cypress {
     interface Chainable<Subject> {

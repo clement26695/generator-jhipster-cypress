@@ -44,9 +44,6 @@ _%>
   <%= entityInstance%>TitleSelector
 } from '../../support/page-objects/entities/<%= entityFileName%>-pages';
 
-// TODO: conditionnal adding
-import { datetimeToMinutes } from '../../support/utils';
-
 <%_
 const baseApi = (applicationType === 'gateway' && locals.microserviceName) ? microserviceName.toLowerCase() + '/api/' : 'api/';
 
@@ -156,12 +153,11 @@ describe('<%= entityClass %> e2e test', () => {
 
     <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
       .clear()
-      .then($input => {
-        const htmlElementInput = $input.get(0);
-        const currentDateInMinutes = htmlElementInput.value === '' ? 0 : datetimeToMinutes(htmlElementInput.value);
-        htmlElementInput.stepUp(datetimeToMinutes('2001-01-01T02:30') - currentDateInMinutes);
+      .then(input => {
+        input[0].dispatchEvent(new Event('input', { bubbles: true }))
+        input.val('2001-01-01T02:30')
       })
-      .trigger('change', {force: true})
+      .click()
       .should('have.value', '2001-01-01T02:30');
 
     <%_ } else if (fieldType === 'Duration') { _%>
@@ -340,12 +336,11 @@ describe('<%= entityClass %> e2e test', () => {
 
     <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
       .clear()
-      .then($input => {
-        const htmlElementInput = $input.get(0);
-        const currentDateInMinutes = htmlElementInput.value === '' ? 0 : datetimeToMinutes(htmlElementInput.value);
-        htmlElementInput.stepUp(datetimeToMinutes('2019-01-01T02:30') - currentDateInMinutes);
+      .then(input => {
+        input[0].dispatchEvent(new Event('input', { bubbles: true }))
+        input.val('2019-01-01T02:30')
       })
-      .trigger('change', {force: true})
+      .click()
       .should('have.value', '2019-01-01T02:30');
 
     <%_ } else if (fieldType === 'Duration') { _%>
