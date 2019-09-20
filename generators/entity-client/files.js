@@ -33,15 +33,15 @@ const cypressFiles = {
             templates: [
                 {
                     file: 'cypress/fixtures/entity-body.json',
-                    renameTo: generator => `cypress/fixtures/${generator.entityFileName}-body.json`
+                    renameTo: (generator) => `cypress/fixtures/${generator.entityFileName}-body.json`
                 },
                 {
                     file: 'cypress/specs/entities/entity.spec.ts',
-                    renameTo: generator => `cypress/specs/entities/${generator.entityFileName}.spec.ts`
+                    renameTo: (generator) => `cypress/specs/entities/${generator.entityFileName}.spec.ts`
                 },
                 {
                     file: 'cypress/support/page-objects/entities/entity-pages.ts',
-                    renameTo: generator => `cypress/support/page-objects/entities/${generator.entityFileName}-pages.ts`
+                    renameTo: (generator) => `cypress/support/page-objects/entities/${generator.entityFileName}-pages.ts`
                 },
                 'cypress/support/entities.ts'
             ]

@@ -71,13 +71,13 @@ module.exports = class extends BaseGenerator {
         path = 'tsconfig.json';
         const tsconfigJSON = this.fs.readJSON(path);
 
-        tsconfigJSON.exclude.push("src/test/javascript/cypress");
+        tsconfigJSON.exclude.push('src/test/javascript/cypress');
         jsonfile.writeFileSync(path, tsconfigJSON);
 
         if (this.clientFramework === 'angularX') {
             path = 'tsconfig-aot.json';
             const tsconfigAotJSON = this.fs.readJSON(path);
-            tsconfigAotJSON.exclude = ["src/test/javascript/cypress"];
+            tsconfigAotJSON.exclude = ['src/test/javascript/cypress'];
             jsonfile.writeFileSync(path, tsconfigAotJSON);
         }
 
