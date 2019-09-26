@@ -1,4 +1,4 @@
-name: Test sample apps
+name: Vue.js - Test sample apps
 
 on: [push]
 
@@ -54,7 +54,7 @@ jobs:
           npm link
         env:
           GENERATOR_JHIPSTER_URL: https://github.com/clement26695/generator-jhipster.git
-          GENERATOR_JHIPSTER_BRANCH: feature/add-e2e-selectors
+          GENERATOR_JHIPSTER_BRANCH: v6.3.1
       - name: TOOLS -> install JHipster Vue.js Blueprint
         run: |
           cd $HOME
@@ -65,7 +65,7 @@ jobs:
           npm link
         env:
           GENERATOR_VUEJS_BLUEPRINT_URL: https://github.com/clement26695/jhipster-vuejs.git
-          GENERATOR_VUEJS_BLUEPRINT_BRANCH: feature/add-e2e-selectors
+          GENERATOR_VUEJS_BLUEPRINT_BRANCH: ci-cypress
       - name: TOOLS -> install generator-jhipster-cypress
         run: |
           cd $GITHUB_WORKSPACE
