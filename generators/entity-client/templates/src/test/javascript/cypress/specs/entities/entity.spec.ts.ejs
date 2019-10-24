@@ -152,12 +152,7 @@ describe('<%= entityClass %> e2e test', () => {
       .should('have.value', '2001-01-01');
 
     <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
-      .clear()
-      .then(input => {
-        input[0].dispatchEvent(new Event('input', { bubbles: true }))
-        input.val('2001-01-01T02:30')
-      })
-      .click()
+      .type('2001-01-01T02:30')
       .should('have.value', '2001-01-01T02:30');
 
     <%_ } else if (fieldType === 'Duration') { _%>
@@ -336,11 +331,7 @@ describe('<%= entityClass %> e2e test', () => {
 
     <%_ } else if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
       .clear()
-      .then(input => {
-        input[0].dispatchEvent(new Event('input', { bubbles: true }))
-        input.val('2019-01-01T02:30')
-      })
-      .click()
+      .type('2019-01-01T02:30')
       .should('have.value', '2019-01-01T02:30');
 
     <%_ } else if (fieldType === 'Duration') { _%>
